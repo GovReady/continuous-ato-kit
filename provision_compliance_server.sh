@@ -3,6 +3,8 @@
 # This script provisions a GsovReady-Q Compliance Server into which
 # application server security scan test results will be stored.
 #
+# The script requires that docker, 'curl' and 'jq' be installed.
+#
 # This script begins by performing administrative functions that
 # would normally be done manually by the compliance server system
 # administrator:
@@ -60,10 +62,15 @@ done
 echo
 
 # Run the following in Python in the container's environment.
-docker container exec -i govready-q python <<EOF;
+# The Python code sets up the container and outputs information
+# for calling the API, which we redirect to save in q.json on
+# the host.
+docker container exec -i govready-q python <<EOF > q.json;
 # initialize django
 import os; os.environ.setdefault("DJANGO_SETTINGS_MODULE", "siteapp.settings")
 import django; django.setup()
+
+import json
 
 from siteapp.models import User, Organization
 from guidedmodules.models import AppSource
@@ -88,14 +95,40 @@ appsrc.save()
 # Start the app.
 ################
 project = start_app("demo/unix_file_server", org, user, None, None, None)
-print() # there's some output, so separate it from what comes next
-print()
 
 # Import some saved data for this app.
 # TODO
 
 # Output the API call info.
 ###########################
-print("API URL:", project.get_api_url())
-print("API Key:", user.get_api_keys()['rw'])
+print(json.dumps({
+	"url": project.get_api_url(),
+	"key": user.get_api_keys()['rw'],
+}, indent=2))
 EOF
+
+# Back on the host machine...
+
+# Test that everything is working. Submit an HTTP POST to the app.
+EXPECTED=hello.govready.com
+curl -s \
+	-F project.file_server.hostname=$EXPECTED \
+	--header "Authorization: $(jq -r .key q.json)" \
+	$(jq -r .url q.json)
+
+# Check that it has the right value.
+ACTUAL=$(curl -s \
+	--header "Authorization: $(jq -r .key q.json)" \
+	$(jq -r .url q.json) \
+	| jq -r .project.file_server.hostname)
+if [[ "$ACTUAL" != "$EXPECTED" ]]; then
+	echo "Test API call failed (got $ACTUAL, should be $EXPECTED)."
+	exit 1
+fi
+
+# Initialize the app with an HTTP POST with JSON and check the result.
+curl -s \
+	--header "Authorization: $(jq -r .key q.json)" \
+	-XPOST --data @file_server_initial_data.json \
+    --header "Content-Type: application/json" \
+	$(jq -r .url q.json)

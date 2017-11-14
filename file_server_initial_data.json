@@ -1,0 +1,8 @@
+{
+  "schema": "GovReady Q Project API 1.0",
+  "project": {
+    "file_server": {
+      "hostname": "demo.example.tld"
+    }
+  }
+}
