@@ -44,11 +44,37 @@ echo "Dowloading docker_container_run.sh..."
 curl -s -o docker_container_run.sh https://raw.githubusercontent.com/GovReady/govready-q/master/deployment/docker/docker_container_run.sh
 chmod +x docker_container_run.sh
 
+# Determine the hostname the container will run as. GovReady-Q
+# is picky and needs to know the hostname that all clients will
+# access it at. For our demo, we'll be accessing GovReady-Q both
+# from the host machine's web browser as well as from a Jenkins
+# build container. So using 'localhost' or '127.0.0.1' won't work
+# because they mean different things on the host and in a container
+# (i.e. on the host they refer to the host, on the container they
+# refer to the container). We must use an address both the host and
+# the container can see.
+#
+# Since both are in docker, the easiest option is to use the host
+# machine's address on the docker0 bridge network.
+#
+# We're not actually binding to that address --- we're actually
+# binding GovReady-Q to the wildcard interface, i.e. all of the host
+# machine's addresses (which is the default behavior of 'docker run -p').
+# So this has nothing to do with whether the Jenkins containers can
+# see GovReady-Q, only that the hostname that we put into Jenkins
+# matches the hostname that we put into GovReady-Q for Host header
+# checking.
+#
+# This awk script will get the address of this host machine in the
+# Docker bridge network:
+DOCKER0IP=$(ip addr | awk '/inet/ && /docker0/{sub(/\/.*$/,"",$2); print $2}')
+PORT=8001
+
 # Start container. The caller of this script can set additional
 # arguments by putting them in an environment variable named
 # DOCKER_ARGS.
 echo "Starting GovReady-Q docker container..."
-./docker_container_run.sh --relaunch $DOCKER_ARGS
+./docker_container_run.sh --relaunch --address $DOCKER0IP:$PORT ${DOCKER_ARGS-}
 echo
 
 # Wait for container to be ready, i.e. the database is initialized,
@@ -108,6 +134,11 @@ print(json.dumps({
 EOF
 
 # Back on the host machine...
+
+echo "govready_q_api_url = $(jq -r .url q.json)"
+echo "govready_q_api_key = $(jq -r .key q.json)"
+
+exit 0
 
 # Test that everything is working. Submit an HTTP POST to the app.
 EXPECTED=hello.govready.com
