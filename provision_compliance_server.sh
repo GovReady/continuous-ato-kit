@@ -98,13 +98,15 @@ import django; django.setup()
 
 import json
 
-from siteapp.models import User, Organization
+from siteapp.models import User, Organization, Folder
 from guidedmodules.models import AppSource
 from siteapp.views import start_app
 
 # Set up a User named "demo" and print its API key.
 ###################################################
 user, is_new = User.objects.get_or_create(username='demo')
+password = "1234"
+user.set_password(password)
 
 # Set up a new Organization and make the user an admin of it.
 #############################################################
@@ -120,14 +122,19 @@ appsrc.save()
 
 # Start the app.
 ################
-project = start_app("demo/unix_file_server", org, user, None, None, None)
+folder = Folder.objects.create(organization=org, title="App Folder")
+project = start_app("demo/unix_file_server", org, user, folder, None, None)
 
 # Import some saved data for this app.
 # TODO
 
 # Output the API call info.
 ###########################
+# Communicate to the host machine the credentials of the demo user
+# using JSON, so that we can continue scripting it below.
 print(json.dumps({
+	"username": user.username,
+	"password": password,
 	"url": project.get_api_url(),
 	"key": user.get_api_keys()['rw'],
 }, indent=2))
@@ -135,6 +142,8 @@ EOF
 
 # Back on the host machine...
 
+echo "demo username = $(jq -r .username q.json)"
+echo "demo user password = $(jq -r .password q.json)"
 echo "govready_q_api_url = $(jq -r .url q.json)"
 echo "govready_q_api_key = $(jq -r .key q.json)"
 
