@@ -45,12 +45,12 @@ curl -s -o docker_container_run.sh https://raw.githubusercontent.com/GovReady/go
 chmod +x docker_container_run.sh
 
 # Provision a Docker User Defined Network if one has not already been created.
-if ! docker network ls | grep continuousato > /dev/null; then
+if ! docker network ls | grep "\scontinuousato\s" > /dev/null; then
 	docker network create continuousato
 fi
 
 if ! grep "^127.0.0.1\s\s*govready-q$" /etc/hosts > /dev/null; then
-	echo "Hang on, it looks like you didn't add govread-q to your /etc/hosts"
+	echo "Hang on, it looks like you didn't add govready-q to your /etc/hosts"
 	echo "file on the host machine. You should add:"
 	echo
 	echo "127.0.0.1	govready-q"
