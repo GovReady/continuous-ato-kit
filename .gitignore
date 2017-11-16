@@ -1,2 +1,7 @@
+# generated files
 docker_container_run.sh
 q.json
+
+# Emacs
+*~
+\#*\#
