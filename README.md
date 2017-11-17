@@ -96,7 +96,7 @@ While the container is starting, add the Compliance Server container to the `con
 
 	docker network connect continuousato govready-q
 
-The Compliance Server will be known as `govready-q` on the Docker network.
+The Compliance Server will be known as `govready-q` on the `continuousato` virtual network.
 
 The **Target Application Server** will be added to the network through the application’s Jenkinsfile.
 
@@ -137,7 +137,7 @@ TODO. docker command or portainer.io screenshot; login and dashboards of Jenkins
 
 #### Configure Jenkins to Build the Application
 
-For the purposes of this demo, we will build the GovReady-Q application itself.  It is an open source project, and we can pull the source code from the official GitHub repository.  (Or if you prefer, you can clone the official repository into your GitHub account, and use that one.)
+For the purposes of this demo, we will build the GovReady-Q application itself.  It is an open source project, and we can pull the source code from the official GitHub repository.  (Or if you prefer, you can clone the official repository into your GitHub account or another git host, and use that one.)
 
 * Start at the Jenkins dashboard, at http://localhost:8080/
 
