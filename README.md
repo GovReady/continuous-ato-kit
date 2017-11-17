@@ -2,13 +2,13 @@
 
 This repository contains an example for integrating federal cybersecurity compliance practices into an agile continuous integration/continuous deployment pipeline.
 
-In this example, we use Jenkins (a build pipeline), GovReady-Q (a compliance server), and Docker (virtualization), but the architecture could be adapted to other setups.
+In this example, we use Jenkins (a build pipeline), GovReady-Q (a compliance server), OpenSCAP (a security and testing server), a Target Application (a target app to build), and Docker (virtualization). This architecture could be adapted to other other choices of tool and other setups.
 
 ## Architecture
 
-### Systems
+### Pipeline Servers
 
-This pipeline example assumes seven system components:
+This pipeline example models seven common pipeline servers:
 
 * The **Application Source Code Repository**, such as a Github repository, containing the application being built. In this example we will build GovReady-Q.
 * A **Docker Host Machine** running the Docker daemon, which could be your workstation.
@@ -51,7 +51,7 @@ Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Ho
 
 #### Start the Security/Testing Server
 
-TODO
+(TODO - not yet implemented)
 
 #### Start the GovReady-Q Compliance Server
 
@@ -66,7 +66,7 @@ Run it to start the compliance server in the background:
 
 	./docker_container_run.sh --relaunch --address govready-q:8000
 
-##### Set up Docker networking
+##### Set up networking
 
 While the container is starting, set up the Docker network so that the **Target Application Server** can communicate with the **Compliance Server**. We will use a Docker User Defined Network, which is a private virtual network, to connect the containers. Create a network named `continuousato` and then add the Compliance Server container to it:
 
@@ -110,7 +110,7 @@ All of the steps in this section (Start the GovReady-Q Compliance Server) are au
 TODO. docker command or portainer.io screenshot; login and dashboards of Jenkins and GovReady.
 
 
-### Step 3: Set Up Your Target App to Build
+### Step 3: Set Up the Target App to Build, Test and ATO with the Pipeline
 
 #### Configure Jenkins to Build the Application
 
@@ -148,12 +148,18 @@ Add two `Secret Text` credentials. The first looks like:
 
 Set the `govready_q_api_url` and `govready_q_api_key` credentials to the URL and API key retreived when setting up the Compliance Server.
 
-### Step 4: Build the Application and View Compliance Artifacts
+### Step 4: Build, Test, and ATO the Application in the Pipeline
 
 * Start the build.
+* Watch Jenkins run the build tasks.
+* Watch Jenkins run the testing tasks of the application and the security and monitoring server.
+* Watch Jenkins share information with the compliance server to update the System Security Plan and ATO.
+
+### Step 5: View Compliance ATO Artifacts
+
 * View the results in the GovReady-Q Compliance Server.
 
-### Step 5: Tear-down
+### Step 6: Tear-down
 
 Stop the **Build Server** (Jenkins) container simply by typing CTRL+C into its terminal. The container will be automatically removed.
 
