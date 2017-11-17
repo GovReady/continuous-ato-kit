@@ -30,7 +30,7 @@ Get the Continuous ATO Kit by cloning this repository onto the **Docker Host Mac
 
 #### Install Docker
 
-First [install Docker](https://docs.docker.com/engine/installation/) on the **Docker Host Machine** and, if appropriate, [grant non-root users access to run Docker containers](https://docs.docker.com/engine/installation/linux/linux-postinstall/#manage-docker-as-a-non-root-user) (or else use `sudo` when invoking Docker below).
+First [install Docker](https://docs.docker.com/engine/installation/) on the **Docker Host Machine** (if on a Linux machine, you may want to [grant non-root users access to run Docker containers](https://docs.docker.com/engine/installation/linux/linux-postinstall/#manage-docker-as-a-non-root-user)).
 
 #### Start the Jenkins Build Server
 
@@ -43,7 +43,11 @@ On the **Docker Host Machine**, start the Jenkins build server:
 		-v jenkins-data:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock
 		 jenkinsci/blueocean
 
+See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node-js-and-react-app-with-npm/) for further information about starting Jenkins.
+
 (We plan to build the application from its source code repository on Github. If you need to clone the application onto the Docker Host Machine, bind mount the clone directory into the Jenkins container by adding `-v /path/to/application/code:/home` to the arguments above before the last argument.)
+
+Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**.
 
 #### Start the Security/Testing Server
 
@@ -58,7 +62,7 @@ Start the **Compliance Server**, which will be a Docker container running GovRea
 	curl -s -o docker_container_run.sh https://raw.githubusercontent.com/GovReady/govready-q/master/deployment/docker/docker_container_run.sh
 	chmod +x docker_container_run.sh
 
-The run it to start the compliance server in the background listening on port 8000 on the **Docker Host Machine** and on a hostname `govready-q` that we'll create an alias for in a moment:
+Run it to start the compliance server in the background:
 
 	./docker_container_run.sh --relaunch --address govready-q:8000
 
@@ -112,25 +116,25 @@ TODO. docker command or portainer.io screenshot; login and dashboards of Jenkins
 
 For the purposes of this demo, we will build the GovReady-Q application itself.  It is an open source project, and we can pull the source code from the official GitHub repository.  (Or if you prefer, you can clone the official repository into your GitHub account, and use that one.)
 
-Start at the Jenkins dashboard, at http://localhost:8080/
+* Start at the Jenkins dashboard, at http://localhost:8080/
 
-Click on “New Item”.
+* Click on “New Item”.
 
-Enter an item name, such as “GovReady-Q via GitHub”.
+* Enter an item name, such as “GovReady-Q via GitHub”.
 
-Click “Pipeline” as the type of project, then click “OK” at the bottom of the screen.
+* Click “Pipeline” as the type of project, then click “OK” at the bottom of the screen.
 
-Now, to configure the project, click the “Pipeline” tab to scroll down to the Pipeline section.
+* Now, to configure the project, click the “Pipeline” tab to scroll down to the Pipeline section.
 
-For “Definition”, choose “Pipeline script from SCM”.  This will tell Jenkins to look in the GovReady-Q repository for a Jenkinsfile to use as the pipeline script.
+* For “Definition”, choose “Pipeline script from SCM”.  This will tell Jenkins to look in the GovReady-Q repository for a Jenkinsfile to use as the pipeline script.
 
-For “SCM”, choose “Git”.  Then for “Repository URL”, enter the “Clone with HTTPS” URL for the repository, which is “https://github.com/GovReady/govready-q.git”.
+* For “SCM”, choose “Git”.  Then for “Repository URL”, enter the “Clone with HTTPS” URL for the repository, which is “https://github.com/GovReady/govready-q.git”.
 
-You can leave “Credentials” set to “none”.  (For a private repository, you could set up a GitHub personal access token for Jenkins to use, and then provide it to Jenkins here.)
+* You can leave “Credentials” set to “none”.  (For a private repository, you could set up a GitHub personal access token for Jenkins to use, and then provide it to Jenkins here.)
 
 * TODO. Review target app's Jenkinsfile.
 
-Click “Save”, and you’re ready to build.
+* Click “Save”, and you’re ready to build.
 
 #### Provide Compliance Server Credentials
 
