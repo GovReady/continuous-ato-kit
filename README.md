@@ -110,9 +110,27 @@ TODO. docker command or portainer.io screenshot; login and dashboards of Jenkins
 
 #### Configure Jenkins to Build the Application
 
-* TODO. Add configuration.
+For the purposes of this demo, we will build the GovReady-Q application itself.  It is an open source project, and we can pull the source code from the official GitHub repository.  (Or if you prefer, you can clone the official repository into your GitHub account, and use that one.)
+
+Start at the Jenkins dashboard, at http://localhost:8080/
+
+Click on “New Item”.
+
+Enter an item name, such as “GovReady-Q via GitHub”.
+
+Click “Pipeline” as the type of project, then click “OK” at the bottom of the screen.
+
+Now, to configure the project, click the “Pipeline” tab to scroll down to the Pipeline section.
+
+For “Definition”, choose “Pipeline script from SCM”.  This will tell Jenkins to look in the GovReady-Q repository for a Jenkinsfile to use as the pipeline script.
+
+For “SCM”, choose “Git”.  Then for “Repository URL”, enter the “Clone with HTTPS” URL for the repository, which is “https://github.com/GovReady/govready-q.git”.
+
+You can leave “Credentials” set to “none”.  (For a private repository, you could set up a GitHub personal access token for Jenkins to use, and then provide it to Jenkins here.)
 
 * TODO. Review target app's Jenkinsfile.
+
+Click “Save”, and you’re ready to build.
 
 #### Provide Compliance Server Credentials
 
