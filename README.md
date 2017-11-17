@@ -230,7 +230,9 @@ The test stage then sends information about the build to the **Compliance Server
 
 ### Step 6: Tear-down
 
-Stop the **Build Server** (Jenkins) container simply by typing CTRL+C into its terminal. The container will be automatically removed.
+Stop the **Build Server** (Jenkins) container simply by typing CTRL+C into its terminal. The container will be automatically removed. You must also remove its persistent data volume:
+
+	docker volume rm jenkins-data
 
 Remove the **Compliance Server** container using:
 
