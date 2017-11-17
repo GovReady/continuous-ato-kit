@@ -1,6 +1,6 @@
 # Continuous ATO Kit
 
-This repository contains an example for integrating federal cybersecurity compliance practices into an agile continuous integration/continuous deployment pipeline.
+This repository contains an example for integrating federal cybersecurity compliance practices into an agile continuous integration/continuous deployment (CI/CD) pipeline.
 
 In this example, we use Jenkins (a build pipeline), GovReady-Q (a compliance server), OpenSCAP (a security and testing server), a Target Application (a target app to build), and Docker (virtualization). This architecture could be adapted to other other choices of tool and other setups.
 
@@ -14,7 +14,7 @@ This pipeline example models seven common pipeline servers:
 * A **Docker Host Machine** running the Docker daemon, which could be your workstation.
 * A **Build Server**, in this case Jenkins running in a Docker container on the host machine.
 * A **Security and Monitoring Server** (TODO).
-* A **Compliance Server**, in this case GovReady-Q running in a Docker container on the host machine. The Compliance Server provides an API for storing build artifacts and generates a system security plan.
+* A **Compliance Server**, in this case GovReady-Q running in a Docker container on the host machine. The Compliance Server provides an API for storing testing evidence and generates a system security plan.
 * The **Target Application Server** to which the application is being deployed, in this case an ephemeral Docker container created during the build.
 * The **DevSecOps Engineer's (Your) Workstation**, which has a web browser that the engineer will use to access the Compliance Server to inspect compliance artifacts generated during the build. This workstation might be the same as the Docker Host Machine.
 
@@ -40,7 +40,7 @@ On the **Docker Host Machine**, start the Jenkins build server:
 		--name jenkins --rm \
 		-u root \
 		-p 8080:8080 \
-		-v jenkins-data:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock
+		-v jenkins-data:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock \
 		 jenkinsci/blueocean
 
 See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node-js-and-react-app-with-npm/) for further information about starting Jenkins.
@@ -49,13 +49,15 @@ See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node
 
 Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**.
 
+We're running Jenkins in the foreground so you can watch the terminal output. Leave that running and open a new terminal for the steps below.
+
 #### Start the Security/Testing Server
 
 (TODO - not yet implemented)
 
 #### Start the GovReady-Q Compliance Server
 
-The **Compliance Server** is a Docker container running GovReady-Q. In this section we start the container, set up GovReady-Q, and begin a Compliance App. The Compliance App provides an API for storing build artifacts and generates a system security plan.
+The **Compliance Server** is a Docker container running GovReady-Q. In this section we start the container, set up GovReady-Q, and begin a Compliance App. The Compliance App provides an API for storing testing evidence and generates a system security plan.
 
 ##### Launch GovReady-Q
 
@@ -138,6 +140,7 @@ For the purposes of this demo, we will build the GovReady-Q application itself. 
 
 * Click “Save”, and you’re ready to build.
 
+
 #### Provide Compliance Server Credentials
 
 In Jenkins, go to the Credentials page.
@@ -151,6 +154,63 @@ Add two `Secret Text` credentials. The first looks like:
 Set the `govready_q_api_url` and `govready_q_api_key` credentials to the URL and API key retreived when setting up the Compliance Server.
 
 ### Step 4: Build, Test, and ATO the Application in the Pipeline
+
+
+#### Review the Jenkinsfile
+
+The target application uses a `Jenkinsfile` to define the build, test, and deployment steps for the application. The `Jenkinsfile` is stored in the **Application Source Code Repository** and will be fetched by Jenkins when a build is initiated.
+
+Some of the important parts of the Jenkins file are described below.
+
+	pipeline {
+	  agent {
+	    docker {
+	      image 'python:3'
+	      args '-p 8001:8001 --network continuousato'
+	    }
+	  }
+
+The `agent` section defines the properties of an ephemeral Docker container that runs the build steps. This is also our **Target Application Server**. The container is added to the virtual network created earlier using `--network continuousato`, which allows the build container to communicate with the **Compliance Server**. Port forwarding is also enabled with `-p` to allow the DevSecOps Engineer to visit the target application when the build completes (TODO: except the container is ephemeral so not really).
+
+	  stages {
+	    stage('Build App') {
+	      steps {
+	        sh 'pip install -r requirements.txt'
+	      }
+	    }
+
+The build phase contains typical Jenkins build instructions. In this case, we install the target application's Python package dependencies.
+
+	    stage('Test App') {
+	      steps {
+	        sh './manage.py test 2>&1 | tee /tmp/pytestresults.txt'
+
+The test stage runs the target application's tests (unit tests, integration tests, etc.). The Unix `tee` command is used to save the test results to a temporary file while also retaining the console output that is fed to Jenkins.
+
+	        withCredentials([
+	        	string(credentialsId: 'govready_q_api_url', variable: 'Q_API_URL'),
+	        	string(credentialsId: 'govready_q_api_key', variable: 'Q_API_KEY')]) {
+
+	            // Send hostname.
+	            sh 'curl -F project.file_server.hostname=$(hostname)
+	                     --header "Authorization:$Q_API_KEY" $Q_API_URL'
+
+	            // Send test results.
+	            sh 'curl -F "project.file_server.login_message=</tmp/pytestresults.txt"
+	                     --header "Authorization:$Q_API_KEY" $Q_API_URL'
+	        }
+	      }
+	    }
+	  }
+	}
+
+The test stage then sends information about the build to the **Compliance Server** using the GovReady-Q Compliance App's API. `withCredentials` is a Jenkins command that pulls credentials (see above) into environment variables. Within `withCredentials`, two API calls are made:
+
+1. The first API call sends the build machine's hostname, as returned by the Unix `hostname` command, and stores it in the Compliance App's `project.file_server.hostname` data field.
+
+2. The second API call sends the saved test results from the temporary file and stores it in the Compliance App's `project.file_server.login_message` data field. (TODO: Change the field name.)
+
+#### Further Steps (TODO)
 
 * Start the build.
 * Watch Jenkins run the build tasks.
