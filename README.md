@@ -45,17 +45,17 @@ Set up the Docker network so that the **Security and Monitoring Server**, the **
 On the **Docker Host Machine**, start the Jenkins build server:
 
 	docker run \
-		--name jenkins --rm \
-		-u root \
-		-p 8080:8080 \
-		-v jenkins-data:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock \
-		 jenkinsci/blueocean
+	  --name jenkins --rm \
+	  -u root \
+	  -p 8080:8080 \
+	  -v jenkins-data:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock \
+	   jenkinsci/blueocean
 
 See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node-js-and-react-app-with-npm/) for further information about starting Jenkins.
 
 *Advanced*. We will build the application from its source code repository on Github, but you can also build from a local git repository using a Docker bind mount (`-v`) and using a different Jenkins configuration below.
 
-Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**.
+Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**. You should see a page named Unlock Jenkins. Look in the console for the automatically generated admin user password and paste it into the Unlock Jenkins form to log in.
 
 We’re running Jenkins in the foreground so you can watch the terminal output. Leave that running and open a new terminal for the steps below.
 
