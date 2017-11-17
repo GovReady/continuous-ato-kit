@@ -13,7 +13,7 @@ This pipeline example models seven common pipeline components:
 * The **Application Source Code Repository**, such as a Github repository, containing the application being built. In this example we will build GovReady-Q.
 * A **Docker Host Machine** running the Docker daemon, which could be your workstation.
 * A **Build Server**, in this case Jenkins running in a Docker container on the host machine.
-* A **Security and Monitoring Server** (TODO).
+* A **Security and Monitoring Server** running OpenSCAP, in this case running in a Docker container on the host machine.
 * A **Compliance Server**, in this case GovReady-Q running in a Docker container on the host machine. The Compliance Server provides an API for storing testing evidence and generates a system security plan.
 * The **Target Application Server** to which the application is being deployed, in this case an ephemeral Docker container created during the build.
 * The **DevSecOps Engineer’s (Your) Workstation**, which has a web browser that the engineer will use to access the Compliance Server to inspect compliance artifacts generated during the build. This workstation might be the same as the Docker Host Machine.
@@ -34,6 +34,12 @@ Get the Continuous ATO Kit by cloning this repository onto the **Docker Host Mac
 
 First [install Docker](https://docs.docker.com/engine/installation/) on the **Docker Host Machine** (if on a Linux machine, you may want to [grant non-root users access to run Docker containers](https://docs.docker.com/engine/installation/linux/linux-postinstall/#manage-docker-as-a-non-root-user)).
 
+#### Create a Virtual Network
+
+Set up the Docker network so that the **Security and Monitoring Server**, the **Compliance Server**, and the **Target Application Server** can communicate with each other. We will use a Docker User Defined Network, which is a private virtual network, to connect the containers. Create a network named `continuousato`:
+
+	docker network create continuousato
+
 #### Start the Jenkins Build Server
 
 On the **Docker Host Machine**, start the Jenkins build server:
@@ -53,9 +59,21 @@ Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Ho
 
 We’re running Jenkins in the foreground so you can watch the terminal output. Leave that running and open a new terminal for the steps below.
 
-#### Start the Security/Testing Server
+#### Start the Security and Monitoring Server
 
-(TODO - not yet implemented)
+From the **Docker Host Machine**, start a CentOS7 container and install OpenSCAP on it:
+
+	docker container run --rm -it --network continuousato centos:centos7 bash
+	# now inside the Security and Monitoring Server container
+	yum install -y openscap-scanner scap-security-guide elinks
+
+Note that the **Security and Monitoring Server** is started on the `continuousato` virtual network.
+
+Make sure `oscap` is working by scanning the Security and Monitoring Server itself:
+
+	oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml
+	oscap xccdf generate report scan-results.xml > scan-report.html
+	elinks scan-report.html
 
 #### Start the GovReady-Q Compliance Server
 
@@ -74,9 +92,8 @@ Run it to start the compliance server in the background:
 
 ##### Set up networking
 
-While the container is starting, set up the Docker network so that the **Target Application Server** can communicate with the **Compliance Server**. We will use a Docker User Defined Network, which is a private virtual network, to connect the containers. Create a network named `continuousato` and then add the Compliance Server container to it:
+While the container is starting, add the Compliance Server container to the `continuousato` virtual network:
 
-	docker network create continuousato
 	docker network connect continuousato govready-q
 
 The Compliance Server will be known as `govready-q` on the Docker network.
@@ -137,8 +154,6 @@ For the purposes of this demo, we will build the GovReady-Q application itself. 
 * For “SCM”, choose “Git”.  Then for “Repository URL”, enter the “Clone with HTTPS” URL for the repository, which is “https://github.com/GovReady/govready-q.git”.
 
 * You can leave “Credentials” set to “none”.  (For a private repository, you could set up a GitHub personal access token for Jenkins to use, and then provide it to Jenkins here.)
-
-* TODO. Review target app’s Jenkinsfile.
 
 * Click “Save”, and you’re almostready to build.
 
@@ -238,3 +253,6 @@ Remove the **Compliance Server** container using:
 
 	docker container rm -f govready-q
 
+Remove the virtual network:
+
+	docker network rm continuousato
