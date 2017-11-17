@@ -151,11 +151,11 @@ For the purposes of this demo, we will build the GovReady-Q application itself. 
 
 * For “Definition”, choose “Pipeline script from SCM”.  This will tell Jenkins to look in the GovReady-Q repository for a Jenkinsfile to use as the pipeline script.
 
-* For “SCM”, choose “Git”.  Then for “Repository URL”, enter the “Clone with HTTPS” URL for the repository, which is “https://github.com/GovReady/govready-q.git”.
+* For “SCM”, choose “Git”.  Then for “Repository URL”, enter the “Clone with HTTPS” URL for the repository, which is `https://github.com/GovReady/govready-q.git`.
 
-* You can leave “Credentials” set to “none”.  (For a private repository, you could set up a GitHub personal access token for Jenkins to use, and then provide it to Jenkins here.)
+* You can leave “Credentials” set to “none”.  (*Advanced*. For a private repository, you could set up a GitHub personal access token for Jenkins to use, and then provide it to Jenkins here.)
 
-* Click “Save”, and you’re almostready to build.
+* Click “Save”, and you’re almost ready to build.
 
 
 #### Provide Compliance Server Credentials
