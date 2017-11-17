@@ -8,7 +8,7 @@ In this example, we use Jenkins (a build pipeline), GovReady-Q (a compliance ser
 
 ### Pipeline Servers
 
-This pipeline example models seven common pipeline servers:
+This pipeline example models seven common pipeline components:
 
 * The **Application Source Code Repository**, such as a Github repository, containing the application being built. In this example we will build GovReady-Q.
 * A **Docker Host Machine** running the Docker daemon, which could be your workstation.
