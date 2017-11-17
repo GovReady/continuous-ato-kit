@@ -14,7 +14,7 @@ This pipeline example models seven common pipeline servers:
 * A **Docker Host Machine** running the Docker daemon, which could be your workstation.
 * A **Build Server**, in this case Jenkins running in a Docker container on the host machine.
 * A **Security and Monitoring Server** (TODO).
-* A **Compliance Server**, in this case GovReady-Q running in a Docker container on the host machine.
+* A **Compliance Server**, in this case GovReady-Q running in a Docker container on the host machine. The Compliance Server provides an API for storing build artifacts and generates a system security plan.
 * The **Target Application Server** to which the application is being deployed, in this case an ephemeral Docker container created during the build.
 * The **DevSecOps Engineer's (Your) Workstation**, which has a web browser that the engineer will use to access the Compliance Server to inspect compliance artifacts generated during the build. This workstation might be the same as the Docker Host Machine.
 
@@ -45,7 +45,7 @@ On the **Docker Host Machine**, start the Jenkins build server:
 
 See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node-js-and-react-app-with-npm/) for further information about starting Jenkins.
 
-(We plan to build the application from its source code repository on Github. If you need to clone the application onto the Docker Host Machine, bind mount the clone directory into the Jenkins container by adding `-v /path/to/application/code:/home` to the arguments above before the last argument.)
+*Advanced*. We will build the application from its source code repository on Github, but you can also build from a local git repository using a Docker bind mount (`-v`) and using a different Jenkins configuration below.
 
 Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**.
 
@@ -55,9 +55,11 @@ Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Ho
 
 #### Start the GovReady-Q Compliance Server
 
-##### Start the Docker container
+The **Compliance Server** is a Docker container running GovReady-Q. In this section we start the container, set up GovReady-Q, and begin a Compliance App. The Compliance App provides an API for storing build artifacts and generates a system security plan.
 
-Start the **Compliance Server**, which will be a Docker container running GovReady-Q. GovReady-Q provides a shell script to make it easy to start it in a Docker container. Get the shell script from the GovReady-Q Github repository and save it on the **Docker Host Machine**:
+##### Launch GovReady-Q
+
+GovReady-Q provides a shell script to make it easy to start it in a Docker container. Get the shell script from the GovReady-Q Github repository and save it on the **Docker Host Machine**:
 
 	curl -s -o docker_container_run.sh https://raw.githubusercontent.com/GovReady/govready-q/master/deployment/docker/docker_container_run.sh
 	chmod +x docker_container_run.sh
@@ -77,7 +79,7 @@ The Compliance Server will be known as `govready-q` on the Docker network.
 
 The **Target Application Server** will be added to the network through the application's Jenkinsfile.
 
-Although the two containers communicate through the Docker User Defined Network, the **DevSecOps Engineer's Workstation** will connect to the **Compliance Server** via regular networking through Docker port forwarding. The Compliance Server is already listening on port `8000` on the **Docker Host Machine**. Add an alias in the `/etc/hosts` file on the **DevSecOps Engineer's Workstation** for `govready-q` so that the Compliance Server can be reached at the same address as on the Docker network. If the **DevSecOps Engineer's Workstation** is the same machine as the **Docker Host Machine**, use the loopback address:
+Although the two containers communicate through the Docker User Defined Network, the **DevSecOps Engineer's Workstation** will connect to the **Compliance Server** via regular networking and Docker port forwarding. The Compliance Server is already listening on port `8000` on the **Docker Host Machine**. Add an alias in the `/etc/hosts` file on the **DevSecOps Engineer's Workstation** for `govready-q` so that the Compliance Server can be reached easily. If the **DevSecOps Engineer's Workstation** is the same machine as the **Docker Host Machine**, use the loopback address:
 
 	127.0.0.1	govready-q
 
