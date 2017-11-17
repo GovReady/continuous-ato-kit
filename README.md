@@ -16,7 +16,7 @@ This pipeline example models seven common pipeline servers:
 * A **Security and Monitoring Server** (TODO).
 * A **Compliance Server**, in this case GovReady-Q running in a Docker container on the host machine. The Compliance Server provides an API for storing testing evidence and generates a system security plan.
 * The **Target Application Server** to which the application is being deployed, in this case an ephemeral Docker container created during the build.
-* The **DevSecOps Engineer's (Your) Workstation**, which has a web browser that the engineer will use to access the Compliance Server to inspect compliance artifacts generated during the build. This workstation might be the same as the Docker Host Machine.
+* The **DevSecOps Engineer’s (Your) Workstation**, which has a web browser that the engineer will use to access the Compliance Server to inspect compliance artifacts generated during the build. This workstation might be the same as the Docker Host Machine.
 
 ![](docs/c-a-k-20171117-002.png)
 
@@ -51,7 +51,7 @@ See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node
 
 Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**.
 
-We're running Jenkins in the foreground so you can watch the terminal output. Leave that running and open a new terminal for the steps below.
+We’re running Jenkins in the foreground so you can watch the terminal output. Leave that running and open a new terminal for the steps below.
 
 #### Start the Security/Testing Server
 
@@ -81,9 +81,9 @@ While the container is starting, set up the Docker network so that the **Target 
 
 The Compliance Server will be known as `govready-q` on the Docker network.
 
-The **Target Application Server** will be added to the network through the application's Jenkinsfile.
+The **Target Application Server** will be added to the network through the application’s Jenkinsfile.
 
-Although the two containers communicate through the Docker User Defined Network, the **DevSecOps Engineer's Workstation** will connect to the **Compliance Server** via regular networking and Docker port forwarding. The Compliance Server is already listening on port `8000` on the **Docker Host Machine**. Add an alias in the `/etc/hosts` file on the **DevSecOps Engineer's Workstation** for `govready-q` so that the Compliance Server can be reached easily. If the **DevSecOps Engineer's Workstation** is the same machine as the **Docker Host Machine**, use the loopback address:
+Although the two containers communicate through the Docker User Defined Network, the **DevSecOps Engineer’s Workstation** will connect to the **Compliance Server** via regular networking and Docker port forwarding. The Compliance Server is already listening on port `8000` on the **Docker Host Machine**. Add an alias in the `/etc/hosts` file on the **DevSecOps Engineer’s Workstation** for `govready-q` so that the Compliance Server can be reached easily. If the **DevSecOps Engineer’s Workstation** is the same machine as the **Docker Host Machine**, use the loopback address:
 
 	127.0.0.1	govready-q
 
@@ -91,7 +91,7 @@ If the machines are different, use the IP address of the **Docker Host Machine**
 
 ##### Start the Compliance App
 
-Open the GovReady-Q Compliance Server in a web browser on the **DevSecOps Engineer's Workstation** at `http://govready-q:8000`. It may take a few more moments for the server to become ready. Once a login screen appears, return to the **Host Machine** command line to create GovReady-Q's first user account:
+Open the GovReady-Q Compliance Server in a web browser on the **DevSecOps Engineer’s Workstation** at `http://govready-q:8000`. It may take a few more moments for the server to become ready. Once a login screen appears, return to the **Host Machine** command line to create GovReady-Q’s first user account:
 
 	docker container exec -it govready-q ./first_run.sh
 
@@ -138,22 +138,27 @@ For the purposes of this demo, we will build the GovReady-Q application itself. 
 
 * You can leave “Credentials” set to “none”.  (For a private repository, you could set up a GitHub personal access token for Jenkins to use, and then provide it to Jenkins here.)
 
-* TODO. Review target app's Jenkinsfile.
+* TODO. Review target app’s Jenkinsfile.
 
-* Click “Save”, and you’re ready to build.
+* Click “Save”, and you’re almostready to build.
 
 
 #### Provide Compliance Server Credentials
 
-In Jenkins, go to the Credentials page.
+In Jenkins, go to the top level of Jenkins, and then to the Credentials page.
 
-![](jenkins-credentials-1.png)
+Click on a credential scope, such as the global scope.
 
 Add two `Secret Text` credentials. The first looks like:
 
 ![](jenkins-credentials-2.png)
 
 Set the `govready_q_api_url` and `govready_q_api_key` credentials to the URL and API key retreived when setting up the Compliance Server.
+
+Once the credentials have been set, they will look like this:
+
+![](jenkins-credentials-1.png)
+
 
 ### Step 4: Build, Test, and ATO the Application in the Pipeline
 
@@ -181,13 +186,13 @@ The `agent` section defines the properties of an ephemeral Docker container that
 	      }
 	    }
 
-The build phase contains typical Jenkins build instructions. In this case, we install the target application's Python package dependencies.
+The build phase contains typical Jenkins build instructions. In this case, we install the target application’s Python package dependencies.
 
 	    stage('Test App') {
 	      steps {
 	        sh './manage.py test 2>&1 | tee /tmp/pytestresults.txt'
 
-The test stage runs the target application's tests (unit tests, integration tests, etc.). The Unix `tee` command is used to save the test results to a temporary file while also retaining the console output that is fed to Jenkins.
+The test stage runs the target application’s tests (unit tests, integration tests, etc.). The Unix `tee` command is used to save the test results to a temporary file while also retaining the console output that is fed to Jenkins.
 
 	        withCredentials([
 	        	string(credentialsId: 'govready_q_api_url', variable: 'Q_API_URL'),
@@ -206,11 +211,11 @@ The test stage runs the target application's tests (unit tests, integration test
 	  }
 	}
 
-The test stage then sends information about the build to the **Compliance Server** using the GovReady-Q Compliance App's API. `withCredentials` is a Jenkins command that pulls credentials (see above) into environment variables. Within `withCredentials`, two API calls are made:
+The test stage then sends information about the build to the **Compliance Server** using the GovReady-Q Compliance App’s API. `withCredentials` is a Jenkins command that pulls credentials (see above) into environment variables. Within `withCredentials`, two API calls are made:
 
-1. The first API call sends the build machine's hostname, as returned by the Unix `hostname` command, and stores it in the Compliance App's `project.file_server.hostname` data field.
+1. The first API call sends the build machine’s hostname, as returned by the Unix `hostname` command, and stores it in the Compliance App’s `project.file_server.hostname` data field.
 
-2. The second API call sends the saved test results from the temporary file and stores it in the Compliance App's `project.file_server.login_message` data field. (TODO: Change the field name.)
+2. The second API call sends the saved test results from the temporary file and stores it in the Compliance App’s `project.file_server.login_message` data field. (TODO: Change the field name.)
 
 #### Further Steps (TODO)
 
