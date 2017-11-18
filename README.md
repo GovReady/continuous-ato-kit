@@ -57,6 +57,8 @@ See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node
 
 Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**. You should see a page named Unlock Jenkins. Look in the console for the automatically generated admin user password and paste it into the Unlock Jenkins form to log in.
 
+After logging in, choose “Install Suggested Packages”, then “Continue as Admin”, then “Start Using Jenkins”.
+
 We’re running Jenkins in the foreground so you can watch the terminal output. Leave that running and open a new terminal for the steps below.
 
 #### Start the Security and Monitoring Server
