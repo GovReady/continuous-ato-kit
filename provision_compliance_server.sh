@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################################################################
-# This script provisions a GsovReady-Q Compliance Server into which
+# This script provisions a GovReady-Q Compliance Server into which
 # application server security scan test results will be stored.
 #
 # The script requires that docker, 'curl' and 'jq' be installed.
@@ -40,7 +40,7 @@ set -euf -o pipefail # abort script on error
 ###################################################
 
 # Get our helper script from Github.
-echo "Dowloading docker_container_run.sh..."
+echo "Downloading docker_container_run.sh..."
 curl -s -o docker_container_run.sh https://raw.githubusercontent.com/GovReady/govready-q/master/deployment/docker/docker_container_run.sh
 chmod +x docker_container_run.sh
 
@@ -61,7 +61,7 @@ fi
 #
 # The container will get its default name 'govready-q'
 # and we'll tell Q that its hostname will be the same, since we'll
-# allow docker user defined networks to make the container discoverable
+# allow docker user-defined networks to make the container discoverable
 # by its name. We'll connect it to a pre-made network in a second step.
 #
 # The caller of this script can set additional arguments by putting
