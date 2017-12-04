@@ -18,7 +18,7 @@ This pipeline example models seven common pipeline components:
 * The **Target Application Server** to which the application is being deployed, in this case an ephemeral Docker container created during the build.
 * The **DevSecOps Engineer’s (Your) Workstation**, which has a web browser that the engineer will use to access the Compliance Server to inspect compliance artifacts generated during the build. This workstation might be the same as the Docker Host Machine.
 
-![](docs/c-a-k-20171117-002.png)
+![](docs/c-a-k-system-diagram.png)
 
 ## Steps to Create the Pipeline
 
