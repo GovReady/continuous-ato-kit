@@ -1,0 +1,12 @@
+version: '3'
+services:
+  target:
+    image: centos7-ssh
+    environment:
+      SESSION_SECRET_KEY: my-password
+    ports:
+      - "2201:22"
+  sm:
+    image: centos7-ssh
+    ports:
+      - "2202:22"
