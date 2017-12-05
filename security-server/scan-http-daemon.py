@@ -18,9 +18,13 @@ class S(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        (status,output) = commands.getstatusoutput("ssh target@target-app-server 'oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml || oscap xccdf generate report scan-results.xml || cat scan-results.xml'")
-        self._set_headers()
-        self.wfile.write("Status: %s\n\n%s\n" % (status, output))
+        if self.path == '/':
+            (status,output) = commands.getstatusoutput("ssh target@target-app-server 'oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml || oscap xccdf generate report scan-results.xml || cat scan-results.xml'")
+            self._set_headers()
+            self.wfile.write("Status: %s\n\n%s\n" % (status, output))
+        else:
+            self._set_headers(404)
+            self.wfile.write("Invalid URL.\n")
 
     def do_HEAD(self):
         self._set_headers()
