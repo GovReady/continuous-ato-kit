@@ -1,25 +1,18 @@
 # Build on official CentOS 7 image.
 FROM centos:7
 
-# Expose the ssh port.
-EXPOSE 22
-
 # Install scan-http-daemon.py
 COPY scan-http-daemon.py ./
 
-# Install sshd and ssh clients.
+# Install ssh client.
 RUN yum -y update; yum clean all
-RUN yum -y install openssh-server openssh-clients passwd; yum clean all
-RUN mkdir /var/run/sshd
+RUN yum -y install openssh-clients; yum clean all
 
-# Generate SSH keys.
-RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N '' 
-RUN ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N '' 
-RUN ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N '' 
+# Install private key for target app server and disable strict host key check
+RUN mkdir /root/.ssh && chmod 700 /root/.ssh
+COPY keys/target_ecdsa /root/.ssh/id_ecdsa
+RUN chmod 400 /root/.ssh/id_ecdsa
+RUN echo "StrictHostKeyChecking no" >/root/.ssh/config
 
-# Create user.
-ENV SSH_USER=auditor SSH_USERPASS=auditor-password
-RUN useradd $SSH_USER
-RUN echo -e "$SSH_USERPASS\n$SSH_USERPASS" | (passwd --stdin $SSH_USER)
-
-ENTRYPOINT ["/usr/sbin/sshd", "-D"]
+# Run scan daemon.
+ENTRYPOINT ["./scan-http-daemon.py", "8045"]

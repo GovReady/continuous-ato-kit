@@ -1,11 +1,11 @@
-#!/usr/bin/env python                                                                                                           
-"""                                                                                                                             
+#!/usr/bin/env python
+"""
 Adapted from "Very simple HTTP server in python" <https://gist.github.com/bradmontgomery/2219997>
-                                   
+
 Written for Python 2.
 
-Usage::                                                                                                                         
-    ./scan-http-daemon.py [<port>]                                                                                                   
+Usage:
+    ./scan-http-daemon.py [<port>]
 """
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
@@ -18,7 +18,7 @@ class S(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        (status,output) = commands.getstatusoutput("oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml || oscap xccdf generate report scan-results.xml")
+        (status,output) = commands.getstatusoutput("ssh target@target-app-server 'oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml || oscap xccdf generate report scan-results.xml || cat scan-results.xml'")
         self._set_headers()
         self.wfile.write("Status: %s\n\n%s\n" % (status, output))
 

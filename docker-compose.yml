@@ -5,7 +5,7 @@ services:
     ports:
       - "2201:22"
   security-server:
-    image: centos7-ssh
+    image: centos7-security
     ports:
       - "2202:22"
       - "8045:8045"
