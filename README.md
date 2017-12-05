@@ -124,12 +124,12 @@ Follow the prompts:
 
 	Let's create your first Q user. This user will have superuser privileges in the Q administrative interface.
 	Username: demo
-	Email address: you@company.com
+	Email address: you@example.com
 	Password: 
 	Password (again): 
 	Superuser created successfully.
 	Let's create your Q organization.
-	Organization Name: The Most Secure Company
+	Organization Name: The Most Secure Example Company
 
 * Log into the Django admin at http://govready-q:8000/admin.
 
