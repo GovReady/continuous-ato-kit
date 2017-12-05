@@ -114,7 +114,7 @@ If the machines are different, use the IP address of the **Docker Host Machine**
 
 Now open the GovReady-Q Compliance Server in a web browser on the **DevSecOps Engineer’s Workstation** at `http://govready-q:8000`.
 
-##### Start the Compliance App
+##### Start the GovReady-Q Compliance Server
 
 Return to the **Host Machine** command line to create GovReady-Q’s first user account:
 
@@ -149,7 +149,7 @@ Follow the prompts:
 
 Get your write-only API key from the API Keys page. In the site header, click on your name or email address to drop down the user menu. Click “Your API Keys”. Copy your “Write-only key”.
 
-All of the steps in this section (Start the GovReady-Q Compliance Server) are automated by a script named `provision_compliance_server.sh`.
+For your future reference, all of the steps in this section (Start the GovReady-Q Compliance Server) are automated by a script named `provision_compliance_server.sh`.  Since you did these steps by hand, you do not need to run the script now.
 
 #### Review the Environment
 
