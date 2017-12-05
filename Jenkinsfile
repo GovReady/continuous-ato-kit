@@ -52,8 +52,12 @@ pipeline {
               --header "Authorization:$Q_API_KEY" $Q_API_URL'
         }
 
+        echo 'System is compliant.'
+
         // http://www.patorjk.com/software/taag/#p=display&h=3&v=2&f=Standard&t=Compliant
         echo '.  ____                      _ _             _   \n  / ___|___  _ __ ___  _ __ | (_) __ _ _ __ | |_ \n | |   / _ \\| \'_ ` _ \\| \'_ \\| | |/ _` | \'_ \\| __|\n | |__| (_) | | | | | | |_) | | | (_| | | | | |_ \n  \\____\\___/|_| |_| |_| .__/|_|_|\\__,_|_| |_|\\__|\n                      |_|                        '
+
+        echo 'Notifications sent to information system security officer.'
 
       }
     }
