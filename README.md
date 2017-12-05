@@ -88,13 +88,17 @@ GovReady-Q provides a shell script to make it easy to start it in a Docker conta
 	curl -s -o docker_container_run.sh https://raw.githubusercontent.com/GovReady/govready-q/master/deployment/docker/docker_container_run.sh
 	chmod +x docker_container_run.sh
 
-Run it to start the compliance server in the background:
+Run the script to start GovReady-Q:
 
 	./docker_container_run.sh --relaunch --address govready-q:8000
 
+It will wait for the GovReady-Q server to come online and then go to the background.
+
+Note that the data stored in this GovReady-Q container is ephemeral and will be destroyed when the container exits because no database has been configured.
+
 ##### Set up networking
 
-While the container is starting, add the Compliance Server container to the `continuousato` virtual network:
+Add the Compliance Server container to the `continuousato` virtual network:
 
 	docker network connect continuousato govready-q
 
@@ -108,25 +112,42 @@ Although the two containers communicate through the Docker User Defined Network,
 
 If the machines are different, use the IP address of the **Docker Host Machine**.
 
+Now open the GovReady-Q Compliance Server in a web browser on the **DevSecOps Engineer’s Workstation** at `http://govready-q:8000`.
+
 ##### Start the Compliance App
 
-Open the GovReady-Q Compliance Server in a web browser on the **DevSecOps Engineer’s Workstation** at `http://govready-q:8000`. It may take a few more moments for the server to become ready. Once a login screen appears, return to the **Host Machine** command line to create GovReady-Q’s first user account:
+Return to the **Host Machine** command line to create GovReady-Q’s first user account:
 
 	docker container exec -it govready-q ./first_run.sh
 
 Follow the prompts:
 
-	TODO: Show output.
+	Let's create your first Q user. This user will have superuser privileges in the Q administrative interface.
+	Username: demo
+	Email address: you@company.com
+	Password: 
+	Password (again): 
+	Superuser created successfully.
+	Let's create your Q organization.
+	Organization Name: The Most Secure Company
 
-TODO....
+* Log into the Django admin at http://govready-q:8000/admin.
 
-* Log into the Django admin and add an AppSource for the GovReady-Q apps necessary for this demo at https://github.com/GovReady/tacr-demo-apps.
+* Remove the sample apps: Go to “App sources”, then “samples”, then click “Delete” at the bottom of the page, and confirm the delete.
 
-* Use GovReady-Q to start a new compliance app.
+* Add an AppSource for the GovReady-Q apps necessary for this demo: Click “Add app source” at the top right. Enter the namespace `tacr`, choose the “Git Repository over SSH” source type, and enter `https://github.com/GovReady/tacr-demo-apps` for the URL. Click “Save”.
 
-* Get its API URL.
+* Use GovReady-Q to start a new compliance app: Return to http://govready-q:8000/ and log in if necessary. Click “Add my first app”. Choose “TACR SSP All”. Click “Add to project” and “Begin”.
 
-* Get your write-only API key from the API Keys page.
+* Start Unix File Server app: Click “File Server”, then “Unix Server”, then “Add app”.
+
+* Get Unix File Server's API URL: Click “Unix Server”, then “API Docs”, then copy its API GET request URL listed at the top of the page. It will look like:
+
+	http://govready-q:8000/api/v1/organizations/main/projects/4/answers
+
+##### Get your GovReady-Q API key
+
+Get your write-only API key from the API Keys page. In the site header, click on your name or email address to drop down the user menu. Click “Your API Keys”. Copy your “Write-only key”.
 
 All of the steps in this section (Start the GovReady-Q Compliance Server) are automated by a script named `provision_compliance_server.sh`.
 
