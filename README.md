@@ -160,7 +160,7 @@ TODO. docker command or portainer.io screenshot; login and dashboards of Jenkins
 
 #### Configure Jenkins to Build the Application
 
-For the purposes of this demo, we will build the GovReady-Q application itself.  It is an open source project, and we can pull the source code from the official GitHub repository.  (Or if you prefer, you can clone the official repository into your GitHub account or another git host, and use that one.)
+For the purposes of this demo, we will build the Jenkinsfile in this repository. We will have Jenkins pull the code in this repository directly from Github. (Or if you prefer, you can clone the repository into your GitHub account or another git host, and use that one, or used the Advanced Jenkins configuration earlier to load it from the local disk.)
 
 * Start at the Jenkins dashboard, at http://localhost:8080/
 
@@ -174,7 +174,7 @@ For the purposes of this demo, we will build the GovReady-Q application itself. 
 
 * For “Definition”, choose “Pipeline script from SCM”.  This will tell Jenkins to look in a repository for a Jenkinsfile to use as the pipeline script.
 
-* For “SCM”, choose “Git”.  Then for “Repository URL”, enter the “Clone with HTTPS” URL for the repository, which is `https://github.com/GovReady/continuous-ato-kit`.
+* For “SCM”, choose “Git”.  Then for “Repository URL”, enter the URL for the repository, which is `https://github.com/GovReady/continuous-ato-kit`.
 
 * You can leave “Credentials” set to “none”.  (*Advanced*. For a private repository, you could set up a GitHub personal access token for Jenkins to use, and then provide it to Jenkins here.)
 
@@ -185,13 +185,11 @@ For the purposes of this demo, we will build the GovReady-Q application itself. 
 
 In Jenkins, go to the top level of Jenkins, and then to the Credentials page.
 
-Click on a credential scope, such as the global scope.
-
-Add two `Secret Text` credentials. The first looks like:
+Click on a credential scope, such as the global scope. Click on “Add credentials”. Change “Kind” to “Secret text”. For the “Secret”, paste the GovReady-Q Unix Server API URL. For “ID”, enter `govready_q_api_url`. And click “OK”.
 
 ![](jenkins-credentials-2.png)
 
-Set the `govready_q_api_url` and `govready_q_api_key` credentials to the URL and API key retreived when setting up the Compliance Server in the previous steps.
+Add a second “Secret text” credential in the same manner where the “Secret” is the GovReady-Q API Key and the “ID” is `govready_q_api_key`.
 
 Once the credentials have been set, they will look like this:
 
