@@ -166,15 +166,15 @@ For the purposes of this demo, we will build the GovReady-Q application itself. 
 
 * Click on “New Item”.
 
-* Enter an item name, such as “GovReady-Q via GitHub”.
+* Enter an item name, such as “Continuous ATO Kit”.
 
 * Click “Pipeline” as the type of project, then click “OK” at the bottom of the screen.
 
 * Now, to configure the project, click the “Pipeline” tab to scroll down to the Pipeline section.
 
-* For “Definition”, choose “Pipeline script from SCM”.  This will tell Jenkins to look in the GovReady-Q repository for a Jenkinsfile to use as the pipeline script.
+* For “Definition”, choose “Pipeline script from SCM”.  This will tell Jenkins to look in a repository for a Jenkinsfile to use as the pipeline script.
 
-* For “SCM”, choose “Git”.  Then for “Repository URL”, enter the “Clone with HTTPS” URL for the repository, which is `https://github.com/GovReady/govready-q.git`.
+* For “SCM”, choose “Git”.  Then for “Repository URL”, enter the “Clone with HTTPS” URL for the repository, which is `https://github.com/GovReady/continuous-ato-kit`.
 
 * You can leave “Credentials” set to “none”.  (*Advanced*. For a private repository, you could set up a GitHub personal access token for Jenkins to use, and then provide it to Jenkins here.)
 
@@ -191,7 +191,7 @@ Add two `Secret Text` credentials. The first looks like:
 
 ![](jenkins-credentials-2.png)
 
-Set the `govready_q_api_url` and `govready_q_api_key` credentials to the URL and API key retreived when setting up the Compliance Server.
+Set the `govready_q_api_url` and `govready_q_api_key` credentials to the URL and API key retreived when setting up the Compliance Server in the previous steps.
 
 Once the credentials have been set, they will look like this:
 
@@ -200,6 +200,7 @@ Once the credentials have been set, they will look like this:
 
 ### Step 4: Build, Test, and ATO the Application in the Pipeline
 
+TODO: Explain how to build.
 
 #### Review the Jenkinsfile
 
