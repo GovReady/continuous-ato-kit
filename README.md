@@ -185,7 +185,7 @@ For the purposes of this demo, we will build the Jenkinsfile in this repository.
 
 In Jenkins, go to the top level of Jenkins, and then to the Credentials page.
 
-Click on a credential scope, such as the global scope. Click on “Add credentials”. Change “Kind” to “Secret text”. For the “Secret”, paste the GovReady-Q Unix Server API URL. For “ID”, enter `govready_q_api_url`. And click “OK”.
+Click on a credential scope, such as the global scope. Click on “Add credentials”. Change “Kind” to “Secret text”. For the “Secret”, paste the GovReady-Q Unix Server API URL. For “ID”, enter `govready_q_api_url`. Optionally add a description. And click “OK”.
 
 ![](jenkins-credentials-2.png)
 
@@ -197,6 +197,10 @@ Once the credentials have been set, they will look like this:
 
 
 ### Step 4: Build, Test, and ATO the Application in the Pipeline
+
+Return to the top level of Jenkins, then in the list of projects open the Continuous ATO Kit pipeline project.
+
+Click “Open in Blue Ocean”. Then click “Run”. When the build appears in the History, it.
 
 TODO: Explain how to build.
 
