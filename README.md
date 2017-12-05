@@ -120,7 +120,7 @@ Follow the prompts:
 
 TODO....
 
-* Log into the Django admin and add an AppSource for the GovReady-Q sample apps at https://github.com/GovReady/govready-sample-apps.
+* Log into the Django admin and add an AppSource for the GovReady-Q apps necessary for this demo at https://github.com/GovReady/tacr-demo-apps.
 
 * Use GovReady-Q to start a new compliance app.
 

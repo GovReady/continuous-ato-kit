@@ -112,7 +112,7 @@ if not org:
 # Add an AppSource called "samples".
 ####################################
 appsrc, is_new = AppSource.objects.get_or_create(namespace="demo")
-appsrc.spec = { 'type': "git", "url": "https://github.com/GovReady/govready-sample-apps" }
+appsrc.spec = { 'type': "git", "url": "https://github.com/GovReady/tacr-demo-apps" }
 appsrc.save()
 
 # Start the app.
