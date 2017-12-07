@@ -13,6 +13,18 @@ services:
     volumes:
       - jenkins-data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ato_network
+  govready-q:
+    image: govready/govready-q
+    ports:
+      - "8000:8000"
+    environment:
+      - ADDRESS=govready-q:8000
+      - HTTPS=false
+      - DBURL=
+    networks:
+      - ato_network
   security-server:
     image: centos7-security
     ports:
