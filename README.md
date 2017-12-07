@@ -13,7 +13,7 @@ This pipeline example models seven common pipeline components:
 * The **Application Source Code Repository**, such as a Github repository, containing the application being built. In this example we will build GovReady-Q.
 * A **Docker Host Machine** running the Docker daemon, which could be your workstation.
 * A **Build Server**, in this case Jenkins running in a Docker container on the host machine.
-* A **Security and Monitoring Server** running OpenSCAP, in this case running in a Docker container on the host machine.
+* A **Security and Monitoring Server** that calls OpenSCAP, in this case running in a Docker container on the host machine.
 * A **Compliance Server**, in this case GovReady-Q running in a Docker container on the host machine. The Compliance Server provides an API for storing testing evidence and generates a system security plan.
 * The **Target Application Server** to which the application is being deployed, in this case an ephemeral Docker container created during the build.
 * The **DevSecOps Engineer’s (Your) Workstation**, which has a web browser that the engineer will use to access the Compliance Server to inspect compliance artifacts generated during the build. This workstation might be the same as the Docker Host Machine.
@@ -36,9 +36,9 @@ First [install Docker](https://docs.docker.com/engine/installation/) on the **Do
 
 #### Create a Virtual Network
 
-Set up the Docker network so that the **Security and Monitoring Server**, the **Compliance Server**, and the **Target Application Server** can communicate with each other. We will use a Docker User Defined Network, which is a private virtual network, to connect the containers. Create a network named `continuousato`:
+Set up the Docker network so that the **Security and Monitoring Server**, the **Compliance Server**, and the **Target Application Server** can communicate with each other. We will use a Docker User Defined Network, which is a private virtual network, to connect the containers. Create a network named `continuousatokit_ato_network`:
 
-	docker network create continuousato
+	docker network create continuousatokit_ato_network
 
 #### Start the Jenkins Build Server
 
@@ -61,21 +61,16 @@ After logging in, choose “Install Suggested Packages”, then “Continue as A
 
 We’re running Jenkins in the foreground so you can watch the terminal output. Leave that running and open a new terminal for the steps below.
 
-#### Start the Security and Monitoring Server
+#### Create and Start the Security and Monitoring Server
 
-From the **Docker Host Machine**, start a CentOS7 container and install OpenSCAP on it:
+Build the Docker image for the **Security and Monitoring Server**:
 
-	docker container run --rm -it --network continuousato centos:centos7 bash
-	# now inside the Security and Monitoring Server container
-	yum install -y openscap-scanner scap-security-guide elinks
+	(TODO: flesh out these steps, or move the build from `security-server/Dockerfile` into `docker-compose.yml`.)
+	docker build -t centos7-security -f security-server/Dockerfile security-server
 
-Note that the **Security and Monitoring Server** is started on the `continuousato` virtual network.
+Use Docker Compose to start the **Security and Monitoring Server**:
 
-Make sure `oscap` is working by scanning the Security and Monitoring Server itself:
-
-	oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml
-	oscap xccdf generate report scan-results.xml > scan-report.html
-	elinks scan-report.html
+	docker-compose up
 
 #### Start the GovReady-Q Compliance Server
 
@@ -98,11 +93,11 @@ Note that the data stored in this GovReady-Q container is ephemeral and will be 
 
 ##### Set up networking
 
-Add the Compliance Server container to the `continuousato` virtual network:
+Add the Compliance Server container to the `continuousatokit_ato_network` virtual network:
 
-	docker network connect continuousato govready-q
+	docker network connect continuousatokit_ato_network govready-q
 
-The Compliance Server will be known as `govready-q` on the `continuousato` virtual network.
+The Compliance Server will be known as `govready-q` on the `continuousatokit_ato_network` virtual network.
 
 The **Target Application Server** will be added to the network through the application’s Jenkinsfile.
 
@@ -214,11 +209,11 @@ Some of the important parts of the Jenkins file are described below.
 	  agent {
 	    docker {
 	      image 'python:3'
-	      args '-p 8001:8001 --network continuousato'
+	      args '--network continuousatokit_ato_network'
 	    }
 	  }
 
-The `agent` section defines the properties of an ephemeral Docker container that runs the build steps. This is also our **Target Application Server**. The container is added to the virtual network created earlier using `--network continuousato`, which allows the build container to communicate with the **Compliance Server**. Port forwarding is also enabled with `-p` to allow the DevSecOps Engineer to visit the target application when the build completes (TODO: except the container is ephemeral so not really).
+The `agent` section defines the properties of an ephemeral Docker container that runs the build steps. This is also our **Target Application Server**. The container is added to the virtual network created earlier using `--network continuousatokit_ato_network`, which allows the build container to communicate with the **Compliance Server**.
 
 	  stages {
 	    stage('Build App') {
@@ -275,10 +270,14 @@ Stop the **Build Server** (Jenkins) container simply by typing CTRL+C into its t
 
 	docker volume rm jenkins-data
 
+Remove the **Security and Monitoring Server**:
+
+	docker-compose rm -s
+
 Remove the **Compliance Server** container using:
 
 	docker container rm -f govready-q
 
 Remove the virtual network:
 
-	docker network rm continuousato
+	docker network rm continuousatokit_ato_network

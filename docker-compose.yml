@@ -1,11 +1,12 @@
 version: '3'
+networks:
+  ato_network:
+    driver: bridge
 services:
-  target-app-server:
-    image: centos7-target
-    ports:
-      - "2201:22"
   security-server:
     image: centos7-security
     ports:
       - "2202:22"
       - "8045:8045"
+    networks:
+      - ato_network
