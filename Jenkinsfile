@@ -8,8 +8,36 @@ pipeline {
   stages {
     stage('OS Setup') {
       steps {
+        // Install packages required to build the application.
         sh 'yum -y install https://centos7.iuscommunity.org/ius-release.rpm'
         sh 'yum -y install python36u python36u-devel.x86_64 python36u-pip'
+
+        // Install packages required to allow the Security and Monitoring Server
+        // to log into this container and run OpenSCAP.
+        //
+        // Instal OpenSCAP.
+        sh 'yum install -y openscap-scanner scap-security-guide elinks'
+        //
+        // Install sshd, generate the server SSH keys, and configure sshd to
+        // allow login via a public key:
+        sh 'yum install -y openssh-server openssh-clients'
+        sh 'mkdir /var/run/sshd'
+        sh "ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''"
+        sh "ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N ''"
+        sh "ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''"
+        sh "sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config"
+        //
+        // Create a user for the other server to log in as.
+        sh 'useradd target && mkdir /home/target/.ssh && chmod 700 /home/target/.ssh'
+        //
+        // Install target app server public key.
+        withCredentials([file(credentialsId: 'target_ecdsa.pub', variable: 'TARGET_ECDSA_PUB')]) {
+            sh 'mv "$TARGET_ECDSA_PUB" /home/target/.ssh/authorized_keys'
+        }
+        sh 'chmod 400 /home/target/.ssh/authorized_keys && chown -R target:target /home/target/.ssh'
+        //
+        // Start sshd daemon in the background.
+        sh '/usr/sbin/sshd'
       }
     }
     stage('Build') {
@@ -40,33 +68,8 @@ pipeline {
     }
     stage('Compliance') {
       steps {
-        // Install sshd
-	sh 'yum install -y openssh-server openssh-clients'
-	sh 'mkdir /var/run/sshd'
-
-        // Generate the server SSH keys.
-        sh "ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''"
-        sh "ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N ''"
-        sh "ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''"
-
-        // Allow public key authentication.
-        sh "sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config"
-
-	// Create user.
-	sh 'useradd target && mkdir /home/target/.ssh && chmod 700 /home/target/.ssh'
-
-	// Install target app server public key
-        withCredentials([file(credentialsId: 'target_ecdsa.pub', variable: 'TARGET_ECDSA_PUB')]) {
-            sh 'mv "$TARGET_ECDSA_PUB" /home/target/.ssh/authorized_keys'
-        }
-	sh 'chmod 400 /home/target/.ssh/authorized_keys && chown -R target:target /home/target/.ssh'
-
-	// start sshd
-        sh '/usr/sbin/sshd'
-
-        // Scan system.
-        sh 'yum install -y openscap-scanner scap-security-guide elinks'
-        sh 'curl -s http://security-server:8045/ > /tmp/scan-report.html'
+        // Ask the Security Monitoring Server to scan this system.
+        sh 'curl -s http://security-server:8045/'
 
         // Send hostname, test results, and scan results to Q.
         withCredentials([string(credentialsId: 'govready_q_api_url', variable: 'Q_API_URL'), string(credentialsId: 'govready_q_api_key', variable: 'Q_API_KEY')]) {
@@ -79,11 +82,11 @@ pipeline {
 
         echo 'System is compliant.'
 
+        echo 'Notifications sent to information system security officer.'
+
         // http://www.patorjk.com/software/taag/#p=display&h=3&v=2&f=Standard&t=Compliant
         writeFile file:"ascii.txt", text:'.  ____                      _ _             _   \n  / ___|___  _ __ ___  _ __ | (_) __ _ _ __ | |_ \n | |   / _ \\| \'_ ` _ \\| \'_ \\| | |/ _` | \'_ \\| __|\n | |__| (_) | | | | | | |_) | | | (_| | | | | |_ \n  \\____\\___/|_| |_| |_| .__/|_|_|\\__,_|_| |_|\\__|\n                      |_|                     \n'
         sh 'cat ascii.txt && sleep 4'
-
-        echo 'Notifications sent to information system security officer.'
 
       }
     }

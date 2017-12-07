@@ -56,7 +56,7 @@ Notes:
 
 Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**. You should see a page named Unlock Jenkins. Get the automatically generated administrator password by running:
 
-	docker-compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+	./get-jenkins-password.sh
 
 Paste it into the Unlock Jenkins form to log in. After logging in, choose “Install Suggested Packages”, then “Continue as Admin”, then “Start Using Jenkins”.
 
@@ -74,15 +74,26 @@ Add an alias in the `/etc/hosts` file on the **DevSecOps Engineer’s Workstatio
 
 If the machines are different, use the IP address of the **Docker Host Machine**.
 
-Now open the GovReady-Q Compliance Server in a web browser on the **DevSecOps Engineer’s Workstation** at `http://govready-q:8000`.
-
 ##### Set Up GovReady-Q
+
+Now open the GovReady-Q Compliance Server in a web browser on the **DevSecOps Engineer’s Workstation** at `http://govready-q:8000`.
 
 Return to the **Host Machine** command line to create GovReady-Q’s first user account, a default organization, and start a compliance app:
 
 	docker-compose exec govready-q ./first_run.py
 
-A new administrative user will be created on the GovReady-Q Compliance Server. The username and password will be written to the console.
+A new administrative user will be created on the GovReady-Q Compliance Server. The username and password will be written to the console:
+
+	Creating administrative user...
+	Username: demo
+	Password: 9kAxaPW6hJVLsscf5jbWn6vc
+	API Key: bdAq16aGh0ybzMAWMioCyWqpb2wItlYo
+	Creating default organization...
+	Adding TACR Demo Apps...
+	Starting compliance app...
+	...
+	API URL: http://govready-q:8000/api/v1/organizations/main/projects/3/answers
+
 
 #### Review the Environment
 
@@ -118,16 +129,17 @@ For the purposes of this demo, we will build the Jenkinsfile in this repository.
 
 In Jenkins, go to the top level of Jenkins, and then to the Credentials page.
 
-Click on a credential scope, such as the global scope. Click on “Add credentials”. Change “Kind” to “Secret text”. For the “Secret”, paste the GovReady-Q Unix Server API URL. For “ID”, enter `govready_q_api_url`. Optionally add a description. And click “OK”.
+Click on a credential scope, such as the global scope. Click on “Add credentials”. Change “Kind” to “Secret text”. For the “Secret”, paste the GovReady-Q Unix Server API URL found in the console output from earlier. For “ID”, enter `govready_q_api_url`. Optionally add a description. And click “OK”.
 
 ![](jenkins-credentials-2.png)
 
-Add a second “Secret text” credential in the same manner where the “Secret” is the GovReady-Q API Key and the “ID” is `govready_q_api_key`.
+Add a second “Secret text” credential in the same manner where the “Secret” is the GovReady-Q API Key found in the console output earlier and the “ID” is `govready_q_api_key`.
 
 Once the credentials have been set, they will look like this:
 
 ![](jenkins-credentials-1.png)
 
+Add a third credential whose kind is “Secret file”. Browse to [security-server/keys/id_ecdsa.pub](security-server/keys/id_ecdsa.pub) in this repository to select it. Set the credential ID to `target_ecdsa.pub`.
 
 ### Step 4: Build, Test, and ATO the Application in the Pipeline
 
@@ -200,15 +212,20 @@ The test stage then sends information about the build to the **Compliance Server
 
 ### Step 5: View Compliance ATO Artifacts
 
-* View the results in the GovReady-Q Compliance Server.
+Now view the results in the GovReady-Q Compliance Server. Using the username and password for the GovReady-Q Compliance Server output on the console, log into GovReady-Q `http://govready-q:8000`.
+
+Go to “App Folder”, then “TACR SSP All”.
+
+Click “Review” to inspect the information uploaded to the compliance server during the build.
+
+Go back, then click “SSP Preview” at the bottom of the page. Scroll down to CM-6: Configuration Settings and check that the end of the section reads:
+
+	 A security scan was performed on the system (hostname 02a425ff11e7). The report can be downloaded here.
 
 ### Step 6: Tear-down
 
-Stop the **Build Server** (Jenkins) container simply by typing CTRL+C into its terminal. The container will be automatically removed. You must also remove its persistent data volume:
-
-	docker volume rm jenkins-data
-
-Remove the containers and network started by docker-compose:
+Remove the containers, the network, and the persistent data volume for Jenkins started by docker-compose:
 
 	docker-compose rm -s
+	docker-compose down -v --rmi all
 
