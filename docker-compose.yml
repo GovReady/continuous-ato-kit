@@ -16,11 +16,12 @@ services:
     networks:
       - ato_network
   govready-q:
-    image: govready/govready-q
+    build: ./compliance-server
     ports:
       - "8000:8000"
     environment:
-      - ADDRESS=govready-q:8000
+      - HOST=govready-q
+      - PORT=8000
       - HTTPS=false
       - DBURL=
     networks:

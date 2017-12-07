@@ -36,13 +36,6 @@ First [install Docker](https://docs.docker.com/engine/installation/) on the **Do
 
 On Mac and Windows, Docker Compose is included as part of those desktop installs. On Linux, [install Docker Compose](https://docs.docker.com/compose/install/#install-compose).
 
-#### Create the Security and Monitoring Server Image
-
-Build the Docker image for the **Security and Monitoring Server**:
-
-	(TODO: flesh out these steps, or move the build from `security-server/Dockerfile` into `docker-compose.yml`.)
-	docker build -t centos7-security -f security-server/Dockerfile security-server
-
 #### Start the Pipeline Environment
 
 Use Docker Compose to start the **Build Server**, the **Security and Monitoring Server**, and the **Compliance Server**:
@@ -54,6 +47,8 @@ We’re running Docker Compose in the foreground so you can watch the terminal o
 Notes:
 
 * See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node-js-and-react-app-with-npm/) for further information about starting Jenkins.
+
+* The **Security and Monitoring Server** is based on a CentOS 7 image. A Dockerfile in this repository builds the container's image and installs OpenSCAP.
 
 * The **Security and Monitoring Server**, the **Compliance Server**, and the **Target Application Server** will communicate with each other using a Docker User Defined Network, which is a private virtual network.
 
@@ -81,42 +76,13 @@ If the machines are different, use the IP address of the **Docker Host Machine**
 
 Now open the GovReady-Q Compliance Server in a web browser on the **DevSecOps Engineer’s Workstation** at `http://govready-q:8000`.
 
-##### Create a GovReady-Q User and Organization and Configure GovReady-Q
+##### Set Up GovReady-Q
 
-Return to the **Host Machine** command line to create GovReady-Q’s first user account:
+Return to the **Host Machine** command line to create GovReady-Q’s first user account, a default organization, and start a compliance app:
 
-	docker-compose exec govready-q ./first_run.sh
+	docker-compose exec govready-q ./first_run.py
 
-Follow the prompts:
-
-	Let's create your first Q user. This user will have superuser privileges in the Q administrative interface.
-	Username: demo
-	Email address: you@example.com
-	Password: 
-	Password (again): 
-	Superuser created successfully.
-	Let's create your Q organization.
-	Organization Name: The Most Secure Example Company
-
-* Log into the Django admin at http://govready-q:8000/admin.
-
-* Remove the sample apps: Go to “App sources”, then “samples”, then click “Delete” at the bottom of the page, and confirm the delete.
-
-* Add an AppSource for the GovReady-Q apps necessary for this demo: Click “Add app source” at the top right. Enter the namespace `tacr`, choose the “Git Repository over SSH” source type, and enter `https://github.com/GovReady/tacr-demo-apps` for the URL. Click “Save”.
-
-##### Start a Compliance App
-
-* Use GovReady-Q to start a new compliance app: Return to http://govready-q:8000/ and log in if necessary. Click “Add my first app”. Choose “TACR SSP All”. Click “Add to project” and “Begin”.
-
-* Start Unix File Server app: Click “File Server”, then “Unix Server”, then “Add app”.
-
-* Get Unix File Server's API URL: Click “Unix Server”, then “API Docs”, then copy its API GET request URL listed at the top of the page. It will look like:
-
-	http://govready-q:8000/api/v1/organizations/main/projects/4/answers
-
-##### Get your GovReady-Q API key
-
-Get your write-only API key from the API Keys page. In the site header, click on your name or email address to drop down the user menu. Click “Your API Keys”. Copy your “Write-only key”.
+A new administrative user will be created on the GovReady-Q Compliance Server. The username and password will be written to the console.
 
 #### Review the Environment
 
