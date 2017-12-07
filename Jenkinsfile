@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'centos:7'
-      args '-p 8001:8001 --network continuousato'
+      args '-p 8001:8001 --network continuousatokit_ato_network --name target-app-server'
     }
   }
   stages {
@@ -38,10 +38,33 @@ pipeline {
     }
     stage('Compliance') {
       steps {
+        // Install sshd
+	sh 'yum install -y openssh-server openssh-clients'
+	sh 'mkdir /var/run/sshd'
+
+        // Generate the server SSH keys.
+        sh "ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''"
+        sh "ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N ''"
+        sh "ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''"
+
+        // Allow public key authentication.
+        sh "sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config"
+
+	// Create user.
+	sh 'useradd target && mkdir /home/target/.ssh && chmod 700 /home/target/.ssh'
+
+	// Install target app server public key
+        withCredentials([file(credentialsId: 'target_ecdsa.pub', variable: 'TARGET_ECDSA_PUB')]) {
+            sh 'mv "$TARGET_ECDSA_PUB" /home/target/.ssh/authorized_keys'
+        }
+	sh 'chmod 400 /home/target/.ssh/authorized_keys && chown -R target:target /home/target/.ssh'
+
+	// start sshd
+        sh '/usr/sbin/sshd'
+
         // Scan system.
         sh 'yum install -y openscap-scanner scap-security-guide elinks'
-        sh 'oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml || true'
-        sh 'oscap xccdf generate report scan-results.xml > /tmp/scan-report.html'
+        sh 'curl -s http://security-server:8045/ > /tmp/scan-report.html'
 
         // Send hostname, test results, and scan results to Q.
         withCredentials([string(credentialsId: 'govready_q_api_url', variable: 'Q_API_URL'), string(credentialsId: 'govready_q_api_key', variable: 'Q_API_KEY')]) {
