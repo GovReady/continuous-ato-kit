@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'centos:7'
-      args '-p 8001:8001 --network continuousatokit_ato_network --name target-app-server'
+      args '--network continuousatokit_ato_network --name target-app-server'
     }
   }
   stages {
