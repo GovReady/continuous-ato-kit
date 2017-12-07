@@ -2,7 +2,17 @@ version: '3'
 networks:
   ato_network:
     driver: bridge
+volumes:
+  jenkins-data:
 services:
+  jenkins:
+    image: jenkinsci/blueocean
+    user: root
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
   security-server:
     image: centos7-security
     ports:
