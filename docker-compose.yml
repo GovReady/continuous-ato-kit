@@ -26,7 +26,7 @@ services:
     networks:
       - ato_network
   security-server:
-    image: centos7-security
+    build: ./security-server
     ports:
       - "2202:22"
       - "8045:8045"
