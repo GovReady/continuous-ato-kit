@@ -1,11 +1,35 @@
 version: '3'
+networks:
+  ato_network:
+    driver: bridge
+volumes:
+  jenkins-data:
 services:
-  target-app-server:
-    image: centos7-target
+  jenkins:
+    image: jenkinsci/blueocean
+    user: root
     ports:
-      - "2201:22"
+      - "8080:8080"
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ato_network
+  govready-q:
+    build: ./compliance-server
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=govready-q
+      - PORT=8000
+      - HTTPS=false
+      - DBURL=
+    networks:
+      - ato_network
   security-server:
-    image: centos7-security
+    build: ./security-server
     ports:
       - "2202:22"
       - "8045:8045"
+    networks:
+      - ato_network

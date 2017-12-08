@@ -9,7 +9,7 @@ Usage:
 """
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
-import commands
+import subprocess
 
 class S(BaseHTTPRequestHandler):
     def _set_headers(self, status=200):
@@ -19,12 +19,13 @@ class S(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == '/':
-            (status,output) = commands.getstatusoutput("ssh target@target-app-server 'oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml || oscap xccdf generate report scan-results.xml || cat scan-results.xml'")
+            subprocess.check_call("ssh target@target-app-server 'oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml || oscap xccdf generate report scan-results.xml > /tmp/scan-report.html'", shell=True)
             self._set_headers()
-            self.wfile.write("Status: %s\n\n%s\n" % (status, output))
-        else:
-            self._set_headers(404)
-            self.wfile.write("Invalid URL.\n")
+            self.wfile.write("Status: 200\nContent-Type: text/plain\n\nOK")
+            return
+
+        self._set_headers(404)
+        self.wfile.write("Invalid URL.\n")
 
     def do_HEAD(self):
         self._set_headers()

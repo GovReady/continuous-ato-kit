@@ -13,7 +13,7 @@ This pipeline example models seven common pipeline components:
 * The **Application Source Code Repository**, such as a Github repository, containing the application being built. In this example we will build GovReady-Q.
 * A **Docker Host Machine** running the Docker daemon, which could be your workstation.
 * A **Build Server**, in this case Jenkins running in a Docker container on the host machine.
-* A **Security and Monitoring Server** running OpenSCAP, in this case running in a Docker container on the host machine.
+* A **Security and Monitoring Server** that calls OpenSCAP, in this case running in a Docker container on the host machine.
 * A **Compliance Server**, in this case GovReady-Q running in a Docker container on the host machine. The Compliance Server provides an API for storing testing evidence and generates a system security plan.
 * The **Target Application Server** to which the application is being deployed, in this case an ephemeral Docker container created during the build.
 * The **DevSecOps Engineer’s (Your) Workstation**, which has a web browser that the engineer will use to access the Compliance Server to inspect compliance artifacts generated during the build. This workstation might be the same as the Docker Host Machine.
@@ -30,126 +30,70 @@ Get the Continuous ATO Kit by cloning this repository onto the **Docker Host Mac
 
 ### Step 2: Set Up The Pipeline Environment
 
-#### Install Docker
+#### Install Docker and Docker Compose
 
 First [install Docker](https://docs.docker.com/engine/installation/) on the **Docker Host Machine** (if on a Linux machine, you may want to [grant non-root users access to run Docker containers](https://docs.docker.com/engine/installation/linux/linux-postinstall/#manage-docker-as-a-non-root-user)).
 
-#### Create a Virtual Network
+On Mac and Windows, Docker Compose is included as part of those desktop installs. On Linux, [install Docker Compose](https://docs.docker.com/compose/install/#install-compose).
 
-Set up the Docker network so that the **Security and Monitoring Server**, the **Compliance Server**, and the **Target Application Server** can communicate with each other. We will use a Docker User Defined Network, which is a private virtual network, to connect the containers. Create a network named `continuousato`:
+#### Start the Pipeline Environment
 
-	docker network create continuousato
+Use Docker Compose to start the **Build Server**, the **Security and Monitoring Server**, and the **Compliance Server**:
 
-#### Start the Jenkins Build Server
+	docker-compose up
 
-On the **Docker Host Machine**, start the Jenkins build server:
+We’re running Docker Compose in the foreground so you can watch the terminal output. Leave that running and open a new terminal for the steps below.
 
-	docker run \
-	  --name jenkins --rm \
-	  -u root \
-	  -p 8080:8080 \
-	  -v jenkins-data:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock \
-	   jenkinsci/blueocean
+Notes:
 
-See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node-js-and-react-app-with-npm/) for further information about starting Jenkins.
+* See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node-js-and-react-app-with-npm/) for further information about starting Jenkins.
 
-*Advanced*. We will build the application from its source code repository on Github, but you can also build from a local git repository using a Docker bind mount (`-v`) and using a different Jenkins configuration below.
+* The **Security and Monitoring Server** is based on a CentOS 7 image. A Dockerfile in this repository builds the container's image and installs OpenSCAP.
 
-Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**. You should see a page named Unlock Jenkins. Look in the console for the automatically generated admin user password and paste it into the Unlock Jenkins form to log in.
+* The **Security and Monitoring Server**, the **Compliance Server**, and the **Target Application Server** will communicate with each other using a Docker User Defined Network, which is a private virtual network.
 
-After logging in, choose “Install Suggested Packages”, then “Continue as Admin”, then “Start Using Jenkins”.
+#### Log into Jenkins
 
-We’re running Jenkins in the foreground so you can watch the terminal output. Leave that running and open a new terminal for the steps below.
+Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**. You should see a page named Unlock Jenkins. Get the automatically generated administrator password by running:
 
-#### Start the Security and Monitoring Server
+	./get-jenkins-password.sh
 
-From the **Docker Host Machine**, start a CentOS7 container and install OpenSCAP on it:
+Paste it into the Unlock Jenkins form to log in. After logging in, choose “Install Suggested Packages”, then “Continue as Admin”, then “Start Using Jenkins”.
 
-	docker container run --rm -it --network continuousato centos:centos7 bash
-	# now inside the Security and Monitoring Server container
-	yum install -y openscap-scanner scap-security-guide elinks
+#### Log Into the GovReady-Q Compliance Server
 
-Note that the **Security and Monitoring Server** is started on the `continuousato` virtual network.
+The **Compliance Server** is a Docker container running GovReady-Q. In this section we set up GovReady-Q with a new user and begin a Compliance App. The Compliance App provides an API for storing testing evidence and generates a system security plan.
 
-Make sure `oscap` is working by scanning the Security and Monitoring Server itself:
+##### Workstation Networking Setup
 
-	oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml
-	oscap xccdf generate report scan-results.xml > scan-report.html
-	elinks scan-report.html
+Although the **Target Application Server** and the **Compliance Server** communicate through the Docker User Defined Network, the **DevSecOps Engineer’s Workstation** will connect to the **Compliance Server** via the **Docker Host Machine's** regular networking and Docker port forwarding. The Compliance Server is listening on port `8000` on the **Docker Host Machine**.
 
-#### Start the GovReady-Q Compliance Server
-
-The **Compliance Server** is a Docker container running GovReady-Q. In this section we start the container, set up GovReady-Q, and begin a Compliance App. The Compliance App provides an API for storing testing evidence and generates a system security plan.
-
-##### Launch GovReady-Q
-
-GovReady-Q provides a shell script to make it easy to start it in a Docker container. Get the shell script from the GovReady-Q Github repository and save it on the **Docker Host Machine**:
-
-	curl -s -o docker_container_run.sh https://raw.githubusercontent.com/GovReady/govready-q/master/deployment/docker/docker_container_run.sh
-	chmod +x docker_container_run.sh
-
-Run the script to start GovReady-Q:
-
-	./docker_container_run.sh --relaunch --address govready-q:8000
-
-It will wait for the GovReady-Q server to come online and then go to the background.
-
-Note that the data stored in this GovReady-Q container is ephemeral and will be destroyed when the container exits because no database has been configured.
-
-##### Set up networking
-
-Add the Compliance Server container to the `continuousato` virtual network:
-
-	docker network connect continuousato govready-q
-
-The Compliance Server will be known as `govready-q` on the `continuousato` virtual network.
-
-The **Target Application Server** will be added to the network through the application’s Jenkinsfile.
-
-Although the two containers communicate through the Docker User Defined Network, the **DevSecOps Engineer’s Workstation** will connect to the **Compliance Server** via regular networking and Docker port forwarding. The Compliance Server is already listening on port `8000` on the **Docker Host Machine**. Add an alias in the `/etc/hosts` file on the **DevSecOps Engineer’s Workstation** for `govready-q` so that the Compliance Server can be reached easily. If the **DevSecOps Engineer’s Workstation** is the same machine as the **Docker Host Machine**, use the loopback address:
+Add an alias in the `/etc/hosts` file on the **DevSecOps Engineer’s Workstation** for `govready-q` so that the Compliance Server can be reached easily. If the **DevSecOps Engineer’s Workstation** is the same machine as the **Docker Host Machine**, use the loopback address:
 
 	127.0.0.1	govready-q
 
 If the machines are different, use the IP address of the **Docker Host Machine**.
 
+##### Set Up GovReady-Q
+
 Now open the GovReady-Q Compliance Server in a web browser on the **DevSecOps Engineer’s Workstation** at `http://govready-q:8000`.
 
-##### Start the GovReady-Q Compliance Server
+Return to the **Host Machine** command line to create GovReady-Q’s first user account, a default organization, and start a compliance app:
 
-Return to the **Host Machine** command line to create GovReady-Q’s first user account:
+	docker-compose exec govready-q ./first_run.py
 
-	docker container exec -it govready-q ./first_run.sh
+A new administrative user will be created on the GovReady-Q Compliance Server. The username and password will be written to the console:
 
-Follow the prompts:
-
-	Let's create your first Q user. This user will have superuser privileges in the Q administrative interface.
+	Creating administrative user...
 	Username: demo
-	Email address: you@example.com
-	Password: 
-	Password (again): 
-	Superuser created successfully.
-	Let's create your Q organization.
-	Organization Name: The Most Secure Example Company
+	Password: 9kAxaPW6hJVLsscf5jbWn6vc
+	API Key: bdAq16aGh0ybzMAWMioCyWqpb2wItlYo
+	Creating default organization...
+	Adding TACR Demo Apps...
+	Starting compliance app...
+	...
+	API URL: http://govready-q:8000/api/v1/organizations/main/projects/3/answers
 
-* Log into the Django admin at http://govready-q:8000/admin.
-
-* Remove the sample apps: Go to “App sources”, then “samples”, then click “Delete” at the bottom of the page, and confirm the delete.
-
-* Add an AppSource for the GovReady-Q apps necessary for this demo: Click “Add app source” at the top right. Enter the namespace `tacr`, choose the “Git Repository over SSH” source type, and enter `https://github.com/GovReady/tacr-demo-apps` for the URL. Click “Save”.
-
-* Use GovReady-Q to start a new compliance app: Return to http://govready-q:8000/ and log in if necessary. Click “Add my first app”. Choose “TACR SSP All”. Click “Add to project” and “Begin”.
-
-* Start Unix File Server app: Click “File Server”, then “Unix Server”, then “Add app”.
-
-* Get Unix File Server's API URL: Click “Unix Server”, then “API Docs”, then copy its API GET request URL listed at the top of the page. It will look like:
-
-	http://govready-q:8000/api/v1/organizations/main/projects/4/answers
-
-##### Get your GovReady-Q API key
-
-Get your write-only API key from the API Keys page. In the site header, click on your name or email address to drop down the user menu. Click “Your API Keys”. Copy your “Write-only key”.
-
-For your future reference, all of the steps in this section (Start the GovReady-Q Compliance Server) are automated by a script named `provision_compliance_server.sh`.  Since you did these steps by hand, you do not need to run the script now.
 
 #### Review the Environment
 
@@ -185,16 +129,17 @@ For the purposes of this demo, we will build the Jenkinsfile in this repository.
 
 In Jenkins, go to the top level of Jenkins, and then to the Credentials page.
 
-Click on a credential scope, such as the global scope. Click on “Add credentials”. Change “Kind” to “Secret text”. For the “Secret”, paste the GovReady-Q Unix Server API URL. For “ID”, enter `govready_q_api_url`. Optionally add a description. And click “OK”.
+Click on a credential scope, such as the global scope. Click on “Add credentials”. Change “Kind” to “Secret text”. For the “Secret”, paste the GovReady-Q Unix Server API URL found in the console output from earlier. For “ID”, enter `govready_q_api_url`. Optionally add a description. And click “OK”.
 
 ![](jenkins-credentials-2.png)
 
-Add a second “Secret text” credential in the same manner where the “Secret” is the GovReady-Q API Key and the “ID” is `govready_q_api_key`.
+Add a second “Secret text” credential in the same manner where the “Secret” is the GovReady-Q API Key found in the console output earlier and the “ID” is `govready_q_api_key`.
 
 Once the credentials have been set, they will look like this:
 
 ![](jenkins-credentials-1.png)
 
+Add a third credential whose kind is “Secret file”. Browse to [security-server/keys/id_ecdsa.pub](security-server/keys/id_ecdsa.pub) in this repository to select it. Set the credential ID to `target_ecdsa.pub`.
 
 ### Step 4: Build, Test, and ATO the Application in the Pipeline
 
@@ -214,11 +159,11 @@ Some of the important parts of the Jenkins file are described below.
 	  agent {
 	    docker {
 	      image 'python:3'
-	      args '-p 8001:8001 --network continuousato'
+	      args '--network continuousatokit_ato_network'
 	    }
 	  }
 
-The `agent` section defines the properties of an ephemeral Docker container that runs the build steps. This is also our **Target Application Server**. The container is added to the virtual network created earlier using `--network continuousato`, which allows the build container to communicate with the **Compliance Server**. Port forwarding is also enabled with `-p` to allow the DevSecOps Engineer to visit the target application when the build completes (TODO: except the container is ephemeral so not really).
+The `agent` section defines the properties of an ephemeral Docker container that runs the build steps. This is also our **Target Application Server**. The container is added to the virtual network created earlier using `--network continuousatokit_ato_network`, which allows the build container to communicate with the **Compliance Server**.
 
 	  stages {
 	    stage('Build App') {
@@ -267,18 +212,20 @@ The test stage then sends information about the build to the **Compliance Server
 
 ### Step 5: View Compliance ATO Artifacts
 
-* View the results in the GovReady-Q Compliance Server.
+Now view the results in the GovReady-Q Compliance Server. Using the username and password for the GovReady-Q Compliance Server output on the console, log into GovReady-Q `http://govready-q:8000`.
+
+Go to “App Folder”, then “TACR SSP All”.
+
+Click “Review” to inspect the information uploaded to the compliance server during the build.
+
+Go back, then click “SSP Preview” at the bottom of the page. Scroll down to CM-6: Configuration Settings and check that the end of the section reads:
+
+	 A security scan was performed on the system (hostname 02a425ff11e7). The report can be downloaded here.
 
 ### Step 6: Tear-down
 
-Stop the **Build Server** (Jenkins) container simply by typing CTRL+C into its terminal. The container will be automatically removed. You must also remove its persistent data volume:
+Remove the containers, the network, and the persistent data volume for Jenkins started by docker-compose:
 
-	docker volume rm jenkins-data
+	docker-compose rm -s
+	docker-compose down -v --rmi all
 
-Remove the **Compliance Server** container using:
-
-	docker container rm -f govready-q
-
-Remove the virtual network:
-
-	docker network rm continuousato
