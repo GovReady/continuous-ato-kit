@@ -78,8 +78,7 @@ pipeline {
               -F "project.file_server.hostname=$(hostname)" \
               -F "project.file_server.login_message=</tmp/pytestresults.txt" \
               -F "project.file_server.scap_scan_report=@/tmp/scan-report.html" \
-              -F "project.file_server.scap_scan_report=@/tmp/scan-report.html" \
-              -F "project.file_server.port_scan_output=@/tmp/port-scan-output.txt" \
+              -F "project.file_server.port_scan_output=</tmp/port-scan-output.txt" \
               --header "Authorization:$Q_API_KEY" $Q_API_URL'
         }
 

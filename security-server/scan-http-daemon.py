@@ -28,7 +28,7 @@ class S(BaseHTTPRequestHandler):
         if self.path == '/port-scan':
             (status,output) = commands.getstatusoutput("nmap target-app-server -p- -sT")
             self._set_headers()
-            self.wfile.write(output)
+            self.wfile.write("```\n%s\n```" % output)
             return
 
         self._set_headers(404)
