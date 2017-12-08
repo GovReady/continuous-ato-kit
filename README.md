@@ -27,6 +27,7 @@ This pipeline example models seven common pipeline components:
 Get the Continuous ATO Kit by cloning this repository onto the **Docker Host Machine**.
 
 	git clone https://github.com/GovReady/continuous-ato-kit
+	cd continuous-ato-kit
 
 ### Step 2: Set Up The Pipeline Environment
 
