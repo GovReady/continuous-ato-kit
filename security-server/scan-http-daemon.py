@@ -18,14 +18,20 @@ class S(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if self.path == '/':
+        if self.path == '/oscap':
             subprocess.check_call("ssh target@target-app-server 'oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml || oscap xccdf generate report scan-results.xml > /tmp/scan-report.html'", shell=True)
             self._set_headers()
             self.wfile.write("Status: 200\nContent-Type: text/plain\n\nOK")
             return
 
+        if self.path == '/port-scan':
+            (status,output) = commands.getstatusoutput("nmap target-app-server -p- -sT")
+            self._set_headers()
+            self.wfile.write("Status: 200\nContent-Type: text/plain\n\n" % (status,output))
+            return
+
         self._set_headers(404)
-        self.wfile.write("Invalid URL.\n")
+        self.wfile.write("Status: 404\nContent-Type: text/plain\n\nInvalid URL.\n")
 
     def do_HEAD(self):
         self._set_headers()
