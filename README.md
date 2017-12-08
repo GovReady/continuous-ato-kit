@@ -39,11 +39,12 @@ On Mac and Windows, Docker Compose is included as part of those desktop installs
 
 #### Start the Pipeline Environment
 
-Use Docker Compose to start the **Build Server**, the **Security and Monitoring Server**, and the **Compliance Server**:
+Start the **Build Server**, the **Security and Monitoring Server**, and the **Compliance Server**:
 
-	docker-compose up
+	./atokit-up.sh
+This script uses Docker Compose to start the servers.  You will see the Docker build steps, and then the output will pause while the applications start up.  When the **Build Server** is up, you will see the message *"INFO: Jenkins is fully up and running"*.  When the **Compliance Server** is up, you will see the message *"Applying socialaccount..."* (TODO: Have Q say "GovReady Q is fully up and running".)
 
-We’re running Docker Compose in the foreground so you can watch the terminal output. Leave that running and open a new terminal for the steps below.
+When both servers are up, exit `atokit-up.sh` by hitting control-C.  The servers will continue to run in the background.
 
 Notes:
 
@@ -51,11 +52,11 @@ Notes:
 
 * The **Security and Monitoring Server** is based on a CentOS 7 image. A Dockerfile in this repository builds the container's image and installs OpenSCAP.
 
-* The **Security and Monitoring Server**, the **Compliance Server**, and the **Target Application Server** will communicate with each other using a Docker User Defined Network, which is a private virtual network.
+* The **Security and Monitoring Server**, the **Compliance Server**, and the **Target Application Server** will communicate with each other using a Docker User Defined Network, which is a private virtual network running entirely on your computer.
 
 #### Log into Jenkins
 
-Check that Jenkins is now running at `http://localhost:8080/` on the **Docker Host Machine**. You should see a page named Unlock Jenkins. Get the automatically generated administrator password by running:
+Log into Jenkins at `http://localhost:8080/` on the **Docker Host Machine**. You should see a page named Unlock Jenkins. Get the automatically generated administrator password by running:
 
 	./get-jenkins-password.sh
 
