@@ -15,7 +15,7 @@ pipeline {
         // Install packages required to allow the Security and Monitoring Server
         // to log into this container and run OpenSCAP.
         //
-        // Instal OpenSCAP.
+        // Install OpenSCAP.
         sh 'yum install -y openscap-scanner scap-security-guide elinks'
         //
         // Install sshd, generate the server SSH keys, and configure sshd to
