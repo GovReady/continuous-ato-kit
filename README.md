@@ -228,6 +228,9 @@ Go back, then click “SSP Preview” at the bottom of the page. Scroll down to 
 
 Remove the containers, the network, and the persistent data volume for Jenkins started by docker-compose:
 
-	docker-compose rm -s
-	docker-compose down -v --rmi all
+	./atokit-down.sh
 
+
+There are official base images for GovReady-Q, Jenkins, and CentOS 7 that were pulled down to support the builds, which you may want to keep installed within Docker.  Or if you prefer to remove them to save disk space, you can run:
+
+	./atokit-rm.sh
