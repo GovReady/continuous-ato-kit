@@ -16,7 +16,7 @@ pipeline {
         // to log into this container and run OpenSCAP.
         //
         // Install OpenSCAP.
-        sh 'yum install -y openscap-scanner scap-security-guide elinks'
+        sh 'yum install -y openscap-scanner scap-security-guide'
         //
         // Install sshd, generate the server SSH keys, and configure sshd to
         // allow login via a public key:
