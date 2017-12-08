@@ -9,6 +9,7 @@ Usage:
 """
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
+import commands
 import subprocess
 
 class S(BaseHTTPRequestHandler):
@@ -18,10 +19,16 @@ class S(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if self.path == '/':
+        if self.path == '/oscap':
             subprocess.check_call("ssh target@target-app-server 'oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results scan-results.xml /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml || oscap xccdf generate report scan-results.xml > /tmp/scan-report.html'", shell=True)
             self._set_headers()
-            self.wfile.write("Status: 200\nContent-Type: text/plain\n\nOK")
+            self.wfile.write("OK")
+            return
+
+        if self.path == '/port-scan':
+            (status,output) = commands.getstatusoutput("nmap target-app-server -p- -sT")
+            self._set_headers()
+            self.wfile.write("```\n%s\n```" % output)
             return
 
         self._set_headers(404)

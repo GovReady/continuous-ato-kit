@@ -4,8 +4,8 @@ FROM centos:7
 # Install scan-http-daemon.py
 COPY scan-http-daemon.py ./
 
-# Install ssh client.
-RUN yum -y install openssh-clients
+# Install ssh client and nmap.
+RUN yum -y install openssh-clients nmap
 
 # Install private key for target app server and disable strict host key check
 RUN mkdir /root/.ssh && chmod 700 /root/.ssh
