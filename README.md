@@ -35,7 +35,7 @@ Get the Continuous ATO Kit by cloning this repository.
 	cd continuous-ato-kit
 
 
-# <a name="pipeline"></a> Step 3 - Set up the Pipeline Environment
+# <a name="pipeline"></a> Step 3 - Set Up the Pipeline Environment
 
 ## <a name="network"></a> Step 3(a) - Start the Servers and Network
 
@@ -129,7 +129,7 @@ Your GovReady-Q Compliance Server is now set up.
 
 In the next step, we will set up the build task in Jenkins Build Server. Then we will be ready to run our build and watch our Security and Monitory Server scan our target app and updated our Compliance Artifacts in our GovReady-Q Compliance Server.
 
-# <a name="buildtask"></a> Step 4 - Set up build task
+# <a name="buildtask"></a> Step 4 - Set up Build Task
 
 For the purposes of this demo, we will build the Jenkinsfile in this repository. We will have Jenkins pull the code in this repository directly from Github. (Or if you prefer, you can clone the repository into your GitHub account or another git host, and use that one, or used the Advanced Jenkins configuration earlier to load it from the local disk.)
 
