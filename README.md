@@ -1,15 +1,15 @@
 # Continuous ATO Kit
 
-Incorporating Compliance as Code and continous compliance within the CI/CD pipeline proof of concept.
+Incorporating Compliance as Code and continous compliance within the proof-of-concept CI/CD pipeline.
 
-![Diagram showing a build pipeline environment consisting of a Source Code Repository (GitHub) a Build Server (Jenkins), a Target Application Instance, a Security Server (OpenSCAP), a Compliance Server (GovReady-Q), a DevSecOps Workstation, and Production Environment.](docs/c-a-k-system-diagram-p1.png)
+![Diagram showing a build pipeline environment consisting of a Source Code Repository (GitHub) a Build Server (Jenkins), a Target Application Instance, a Security and Monitoring Server (OpenSCAP), a Compliance Server (GovReady-Q), a DevSecOps Workstation, and Production Environment.](docs/c-a-k-system-diagram-p1.png)
 
 1. [Step 1 - Install Docker](#docker)
 1. [Step 2 - Get the Kit](#getkit)
 1. [Step 3 - Set Up the Pipeline Environemnt](#pipeline)
-	1. [Step 3(a) - Sart the Servers and Network](#network)
+	1. [Step 3(a) - Start the Servers and Network](#network)
 	1. [Step 3(b) - Set up Build Server](#build_server)
-	1. [Step 3(c) - Set up Security Server](#security_server)
+	1. [Step 3(c) - Set up Security and Monitoring Server](#security_server)
 	1. [Step 3(d) - Set up Compliance Server](#compliance_server)
 1. [Step 4 - Set up Build Task](#buildtask)
 1. [Step 5 - Build Target App](#build)
@@ -22,7 +22,7 @@ Incorporating Compliance as Code and continous compliance within the CI/CD pipel
 
 First [install Docker](https://docs.docker.com/engine/installation/) and Docker Compose.
 
-* On Mac and Windows, Docker Compose is included as part of those desktop installs.
+* On Mac and Windows, Docker Compose is included as part of the Docker install.
 
 * On Linux, install Docker and [install Docker Compose](https://docs.docker.com/compose/install/#install-compose). On Linux you may want to [grant non-root users access to run Docker containers](https://docs.docker.com/engine/installation/linux/linux-postinstall/#manage-docker-as-a-non-root-user).
 
@@ -33,7 +33,6 @@ Get the Continuous ATO Kit by cloning this repository.
 
 	git clone https://github.com/GovReady/continuous-ato-kit
 	cd continuous-ato-kit
-
 
 # <a name="pipeline"></a> Step 3 - Set Up the Pipeline Environment
 
@@ -46,14 +45,14 @@ Start the Build Server, the Security and Monitoring Server, and the Compliance S
 This script uses Docker Compose to start the servers.  You will see the Docker build steps, and then the output will pause while the applications start up.
 
 * When the **Build Server** is up, you will see the message *"INFO: Jenkins is fully up and running"*.
-* When the **Security Server** is up, you will see *(todo)*.
-* When the **Compliance Server** is up, you will see the message *"Applying socialaccount..."*
+* When the **Security and Monitoring Server** is up, you will see *(todo)*.
+* When the **Compliance Server** is up, you will see the message *"Applying socialaccount..." (todo, replace with fully up...)*
 
 When all three servers are up, exit the `atokit-up.sh` by hitting control-C.  The servers will continue to run in the background communicating with each other using a Docker User Defined Network, which is a private virtual network running entirely on your computer.
 
 You can verify the Docker containers are up by running `docker-compose ps` in a terminal.
 
-Your Pipeline Environment now exists. In the next step, we'll setup and configure the software in our pipeline.
+Your Pipeline Environment now exists. In the next step, we'll set up and configure the software in our pipeline.
 
 ## <a name="build_server"></a> Step 3(b) - Set up Build Server
 
@@ -67,13 +66,13 @@ Paste it into the Unlock Jenkins form to log in. After logging in, choose “Ins
 
 * See the [Jenkins documentation](https://jenkins.io/doc/tutorials/building-a-node-js-and-react-app-with-npm/) for further information about starting Jenkins.
 
-Your Jenkins Build Server is now setup. Next, we'll set up the Security Server.
+Your Jenkins Build Server is now set up. Next, we'll set up the Security and Monitoring Server.
 
-## <a name="security_server"></a> Step 3(b) - Set up Security Server
+## <a name="security_server"></a> Step 3(b) - Set up Security and Monitoring Server
 
-The Security and Monitoring Server is based on a CentOS 7 image and is automatically set up with OpenSCAP and ready to run. To watch the activity of the Security and Monitor Server, open a terminal and run:
+The Security and Monitoring Server is based on a CentOS 7 image and is automatically set up with OpenSCAP and ready to run. To watch the activity of the Security and Monitoring Server, open a terminal and run:
 
-	docker-compose exec security top
+	docker-compose exec security-server top
 
 Your OpenSCAP Security and Monitoring Server is now set up. Next, we'll set up the Compliance Server.
 
@@ -127,11 +126,11 @@ Add a third credential whose kind is “Secret file”. Browse to [security-serv
 
 Your GovReady-Q Compliance Server is now set up.
 
-In the next step, we will set up the build task in Jenkins Build Server. Then we will be ready to run our build and watch our Security and Monitory Server scan our target app and updated our Compliance Artifacts in our GovReady-Q Compliance Server.
+In the next step, we will set up the build task in Jenkins Build Server. Then we will be ready to run our build and watch our Security and Monitoring Server scan our target app and update our Compliance Artifacts in our GovReady-Q Compliance Server.
 
 # <a name="buildtask"></a> Step 4 - Set up Build Task
 
-For the purposes of this demo, we will build the Jenkinsfile in this repository. We will have Jenkins pull the code in this repository directly from Github. (Or if you prefer, you can clone the repository into your GitHub account or another git host, and use that one, or used the Advanced Jenkins configuration earlier to load it from the local disk.)
+For the purposes of this demo, we will build the Jenkinsfile in this repository. We will have Jenkins pull the code in this repository directly from GitHub. (Or if you prefer, you can clone the repository into your GitHub account or another git host, and use that one, or use the Advanced Jenkins configuration earlier to load it from the local disk.)
 
 * Start at the Jenkins dashboard, at http://localhost:8080/
 
@@ -241,6 +240,6 @@ Remove the containers, the network, and the persistent data volume for Jenkins s
 
 	./atokit-down.sh
 
-There are official base images for GovReady-Q, Jenkins, and CentOS 7 that were pulled down to support the builds, which you may want to keep installed within Docker.  Or if you prefer to remove them to save disk space, you can run:
+There are official base images for GovReady-Q, Jenkins, and CentOS 7 which were pulled down to support the builds. You may want to keep installed within Docker for future use; or if you prefer to remove them to save disk space, you can run:
 
 	./atokit-rm.sh
