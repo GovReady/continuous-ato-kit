@@ -8,10 +8,10 @@ Incorporating Compliance as Code and continuous compliance within the proof-of-c
 1. [Step 2 - Get the Kit](#getkit)
 1. [Step 3 - Set Up the Pipeline Environment](#pipeline)
 	1. [Step 3(a) - Start the Servers and Network](#network)
-	1. [Step 3(b) - Set up Build Server](#build_server)
-	1. [Step 3(c) - Set up Security and Monitoring Server](#security_server)
-	1. [Step 3(d) - Set up Compliance Server](#compliance_server)
-1. [Step 4 - Set up Build Task](#buildtask)
+	1. [Step 3(b) - Set Up Build Server](#build_server)
+	1. [Step 3(c) - Set Up Security and Monitoring Server](#security_server)
+	1. [Step 3(d) - Set Up Compliance Server](#compliance_server)
+1. [Step 4 - Set Up Build Task](#buildtask)
 1. [Step 5 - Build Target App](#build)
 1. [Step 6 - View Compliance Artifacts](#view)
 1. [Discussion](#discussion)
@@ -54,7 +54,7 @@ You can verify that the Docker containers are up by running `docker-compose ps` 
 
 Your Pipeline Environment now exists. In the next step, we'll set up and configure the software in our pipeline.
 
-## <a name="build_server"></a> Step 3(b) - Set up Build Server
+## <a name="build_server"></a> Step 3(b) - Set Up Build Server
 
 The Build Server is Jenkins. In this step, we will unlock Jenkins, install plugins, and create an administration account.
 
@@ -68,7 +68,7 @@ Paste it into the Unlock Jenkins form to log in. After logging in, choose “Ins
 
 Your Jenkins Build Server is now set up. Next, we'll set up the Security and Monitoring Server.
 
-## <a name="security_server"></a> Step 3(b) - Set up Security and Monitoring Server
+## <a name="security_server"></a> Step 3(b) - Set Up Security and Monitoring Server
 
 The Security and Monitoring Server is based on a CentOS 7 image and is automatically set up with OpenSCAP and ready to run. To watch the activity of the Security and Monitoring Server, open a terminal and run:
 
@@ -76,7 +76,7 @@ The Security and Monitoring Server is based on a CentOS 7 image and is automatic
 
 Your OpenSCAP Security and Monitoring Server is now set up. Next, we'll set up the Compliance Server.
 
-## <a name="compliance_server"></a> Step 3(c) -  Set up Compliance Server
+## <a name="compliance_server"></a> Step 3(c) -  Set Up Compliance Server
 
 The Compliance Server is GovReady-Q. In this step, we will add an alias entry for GovReady-Q to our host file, create an administration account, install the correct compliance app to display the compliance of our target app, and share credentials with Jenkins.
 
@@ -128,7 +128,7 @@ Your GovReady-Q Compliance Server is now set up.
 
 In the next step, we will set up the build task in Jenkins Build Server. Then we will be ready to run our build and watch our Security and Monitoring Server scan our target app and update our Compliance Artifacts in our GovReady-Q Compliance Server.
 
-# <a name="buildtask"></a> Step 4 - Set up Build Task
+# <a name="buildtask"></a> Step 4 - Set Up Build Task
 
 For the purposes of this demo, we will build the Jenkinsfile in this repository. We will have Jenkins pull the code in this repository directly from GitHub. (Or if you prefer, you can clone the repository into your GitHub account or another git host, and use that one, or use the Advanced Jenkins configuration earlier to load it from the local disk.)
 
