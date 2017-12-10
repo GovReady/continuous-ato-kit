@@ -100,10 +100,14 @@ Add an alias entry for GovReady-Q to the `/etc/hosts` file on the workstation fr
 
 	127.0.0.1	govready-q
 
-
 (ADVANCE CONFIGURATION NOTE: Use the IP address of the Docker Host if the Docker Host is different from your workstation.)
 
-Now open the GovReady-Q Compliance Server in a web browser at `http://govready-q:8000`.
+Your OpenSCAP Security and Monitoring Server is now set up. Next, we'll set up the Compliance Server.
+
+Now open the GovReady-Q Compliance Server in a web browser at:
+
+	http://govready-q:8000
+
 
 Next, return to a terminal on the Docker host machine and run the following command:
 
@@ -142,6 +146,7 @@ Add a third credential whose kind is “Secret file”. Browse to [security-serv
 Your GovReady-Q Compliance Server is now set up.
 
 In the next step, we will set up the build task in Jenkins Build Server. Then we will be ready to run our build and watch our Security and Monitoring Server scan our target app and update our Compliance Artifacts in our GovReady-Q Compliance Server.
+
 
 # <a name="buildtask"></a> Step 4 - Set up Build Task
 
@@ -255,6 +260,6 @@ Remove the containers, the network, and the persistent data volume for Jenkins s
 
 	./atokit-down.sh
 
-There are official base images for GovReady-Q, Jenkins, and CentOS 7 which were pulled down to support the builds. You may want to keep installed within Docker for future use; or if you prefer to remove them to save disk space, you can run:
+There are official base images for GovReady-Q, Jenkins, and CentOS 7 that were pulled down to support the builds, which you may want to keep installed within Docker.  Or if you prefer to remove them to save disk space, you can run:
 
 	./atokit-rm.sh
