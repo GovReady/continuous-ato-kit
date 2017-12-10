@@ -26,7 +26,7 @@ Once set up, the pipeline's Build Server (Jenkins) will assemble a Target App, t
 
 ![sequence](docs/cak-sequence-20171206-001.png)
 
-The pipeline is simplifed to run on a single workstation playing the role of both Pipeline Environment (Docker Host) and DevSecOps Workstations. Instructions refer to the Pipeline Environment and DevSecOps Workstation in order to communicate what is happening functionality even though it's the same workstation.
+The pipeline is simplifed to run on a single workstation playing the role of both Pipeline Environment (Docker Host) and DevSecOps Workstations. Instructions refer to the Pipeline Environment and DevSecOps Workstation separately in order to communicate what is happening functionally, even though they are implemented by the same workstation in this demonstration.
 
 # <a name="docker"></a> Step 1 - Install Docker
 
@@ -54,7 +54,7 @@ Start the Build Server, the Security and Monitoring Server, and the Compliance S
 This script uses Docker Compose to start the servers.  You will see the Docker build steps, and then the output will pause while the applications start up.
 
 * When the **Build Server** is up, you will see the message *"INFO: Jenkins is fully up and running"*.
-* When the **Security and Monitoring Server** is up, you will see *"INFO: Security and Monitoring Server is fully up and running."*
+* When the **Security and Monitoring Server** is up, you will see the message *"INFO: Security and Monitoring Server is fully up and running."*
 * When the **Compliance Server** is up, you will see the message *"GovReady-Q is fully up and running."*
 
 When all three servers are up, exit the `atokit-up.sh` by hitting control-C.  The log viewer will exit with the message "ERROR: Aborting", which is expected, not an error.  The servers will continue to run in the background, communicating with each other using a Docker user-defined network called `continuousatokit_ato_network` -- a private virtual network running entirely on your computer.

@@ -1,4 +1,6 @@
 # Build on official CentOS 7 image.
+
+# if FROM image is changed, also change atokit-update.sh
 FROM centos:7
 
 # Install scan-http-daemon.py
