@@ -1,0 +1,3 @@
+Host target-app-server
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
