@@ -1,18 +1,18 @@
 # Continuous ATO Kit
 
-Incorporating Compliance as Code and continous compliance within the proof-of-concept CI/CD pipeline.
+Incorporating Compliance as Code and continuous compliance within the proof-of-concept CI/CD pipeline.
 
 ![Diagram showing a build pipeline environment consisting of a Source Code Repository (GitHub) a Build Server (Jenkins), a Target Application Instance, a Security and Monitoring Server (OpenSCAP), a Compliance Server (GovReady-Q), a DevSecOps Workstation, and Production Environment.](docs/c-a-k-system-diagram-p1.png)
 
 1. [Overview](#overview)
 1. [Step 1 - Install Docker](#docker)
 1. [Step 2 - Get the Kit](#getkit)
-1. [Step 3 - Set Up the Pipeline Environemnt](#pipeline)
+1. [Step 3 - Set Up the Pipeline Environment](#pipeline)
 	1. [Step 3(a) - Start the Servers and Network](#network)
-	1. [Step 3(b) - Set up Build Server](#build_server)
-	1. [Step 3(c) - Set up Security and Monitoring Server](#security_server)
-	1. [Step 3(d) - Set up Compliance Server](#compliance_server)
-1. [Step 4 - Set up Build Task](#buildtask)
+	1. [Step 3(b) - Set Up Build Server](#build_server)
+	1. [Step 3(c) - Set Up Security and Monitoring Server](#security_server)
+	1. [Step 3(d) - Set Up Compliance Server](#compliance_server)
+1. [Step 4 - Set Up Build Task](#buildtask)
 1. [Step 5 - Build Target App](#build)
 1. [Step 6 - View Compliance Artifacts](#view)
 1. [Discussion](#discussion)
@@ -34,8 +34,7 @@ First [install Docker](https://docs.docker.com/engine/installation/) and Docker 
 
 * On Mac and Windows, Docker Compose is included as part of the Docker install.
 
-* On Linux, install Docker and [install Docker Compose](https://docs.docker.com/compose/install/#install-compose). On Linux you may want to [grant non-root users access to run Docker containers](https://docs.docker.com/engine/installation/linux/linux-postinstall/#manage-docker-as-a-non-root-user).
-
+* On Linux, after installing Docker, [install Docker Compose](https://docs.docker.com/compose/install/#install-compose). Also, you may want to [grant non-root users access to run Docker containers](https://docs.docker.com/engine/installation/linux/linux-postinstall/#manage-docker-as-a-non-root-user).
 
 # <a name="getkit"></a> Step 2 - Get the Kit
 
@@ -55,16 +54,16 @@ Start the Build Server, the Security and Monitoring Server, and the Compliance S
 This script uses Docker Compose to start the servers.  You will see the Docker build steps, and then the output will pause while the applications start up.
 
 * When the **Build Server** is up, you will see the message *"INFO: Jenkins is fully up and running"*.
-* When the **Security and Monitoring Server** is up, you will see *(todo)*.
-* When the **Compliance Server** is up, you will see the message *"Applying socialaccount..." (todo, replace with fully up...)*
+* When the **Security and Monitoring Server** is up, you will see *"INFO: Security and Monitoring Server is fully up and running."*
+* When the **Compliance Server** is up, you will see the message *"GovReady-Q is fully up and running."*
 
-When all three servers are up, exit the `atokit-up.sh` by hitting control-C.  The servers will continue to run in the background communicating with each other using a Docker User Defined Network, which is a private virtual network running entirely on your computer.
+When all three servers are up, exit the `atokit-up.sh` by hitting control-C.  The log viewer will exit with the message "ERROR: Aborting", which is expected, not an error.  The servers will continue to run in the background, communicating with each other using a Docker user-defined network called `continuousatokit_ato_network` -- a private virtual network running entirely on your computer.
 
 You can verify the Docker containers are up by running `docker-compose ps` in a terminal on the Docker Host.
 
 Your Pipeline Environment now exists. In the next step, we'll set up and configure the software in our pipeline.
 
-## <a name="build_server"></a> Step 3(b) - Set up Build Server
+## <a name="build_server"></a> Step 3(b) - Set Up Build Server
 
 The Build Server is Jenkins. In this step, we will unlock Jenkins, install plugins, and create an administration account.
 
@@ -86,21 +85,21 @@ Choose “Install Suggested Packages”, then “Continue as Admin”, then “S
 
 Your Jenkins Build Server is now set up. Next, we'll set up the Security and Monitoring Server.
 
-## <a name="security_server"></a> Step 3(b) - Set up Security and Monitoring Server
+## <a name="security_server"></a> Step 3(b) - Set Up Security and Monitoring Server
 
 The Security and Monitoring Server is based on a CentOS 7 image and is automatically set up with OpenSCAP and ready to run during the first build process. So there's nothing specific to do for this step.
 
 Next, we'll set up the Compliance Server.
 
-## <a name="compliance_server"></a> Step 3(c) -  Set up Compliance Server
+## <a name="compliance_server"></a> Step 3(c) -  Set Up Compliance Server
 
-The Compliance Server is GovReady-Q. In this step, we will add an alias entry for GovReady-Q to our host file, create an adminstration account, install the correct compliance app to display the compliance of our target app, and share credentials with Jenkins.
+The Compliance Server is GovReady-Q. In this step, we will add an alias entry for GovReady-Q to our host file, create an administration account, install the correct compliance app to display the compliance of our target app, and share credentials with Jenkins.
 
 Add an alias entry for GovReady-Q to the `/etc/hosts` file on the workstation from which you will view GovReady-Q web pages.
 
 	127.0.0.1	govready-q
 
-(ADVANCE CONFIGURATION NOTE: Use the IP address of the Docker Host if the Docker Host is different from your workstation.)
+(ADVANCED CONFIGURATION NOTE: Use the IP address of the Docker Host if the Docker Host is different from your workstation.)
 
 Your OpenSCAP Security and Monitoring Server is now set up. Next, we'll set up the Compliance Server.
 
@@ -109,7 +108,7 @@ Now open the GovReady-Q Compliance Server in a web browser at:
 	http://govready-q:8000
 
 
-Next, return to a terminal on the Docker host machine and run the following command:
+Next, return to a terminal on the Docker Host and run the following command:
 
 	docker-compose exec govready-q ./first_run.py
 
@@ -146,7 +145,6 @@ Add a third credential whose kind is “Secret file”. Browse to [security-serv
 Your GovReady-Q Compliance Server is now set up.
 
 In the next step, we will set up the build task in Jenkins Build Server. Then we will be ready to run our build and watch our Security and Monitoring Server scan our target app and update our Compliance Artifacts in our GovReady-Q Compliance Server.
-
 
 # <a name="buildtask"></a> Step 4 - Set up Build Task
 
