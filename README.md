@@ -45,12 +45,12 @@ Start the Build Server, the Security and Monitoring Server, and the Compliance S
 This script uses Docker Compose to start the servers.  You will see the Docker build steps, and then the output will pause while the applications start up.
 
 * When the **Build Server** is up, you will see the message *"INFO: Jenkins is fully up and running"*.
-* When the **Security and Monitoring Server** is up, you will see *(todo)*.
-* When the **Compliance Server** is up, you will see the message *"Applying socialaccount..." (todo, replace with fully up...)*
+* When the **Security and Monitoring Server** is up, you will see *"INFO: Security and Monitoring Server is fully up and running."*.
+* When the **Compliance Server** is up, you will see the message *"GovReady-Q is fully up and running."*
 
-When all three servers are up, exit the `atokit-up.sh` by hitting control-C.  The servers will continue to run in the background communicating with each other using a Docker User Defined Network, which is a private virtual network running entirely on your computer.
+When all three servers are up, exit the `atokit-up.sh` by hitting control-C.  The log viewer will exit with the message "ERROR: Aborting", which is expected, not an error.  The servers will continue to run in the background, communicating with each other using a Docker user-defined network called `continuousatokit_ato_network` -- a private virtual network running entirely on your computer.
 
-You can verify the Docker containers are up by running `docker-compose ps` in a terminal.
+You can verify that the Docker containers are up by running `docker-compose ps` in a terminal.
 
 Your Pipeline Environment now exists. In the next step, we'll set up and configure the software in our pipeline.
 
@@ -90,7 +90,7 @@ Add an alias entry for GovReady-Q to the `/etc/hosts` file on the workstation fr
 
 Now open the GovReady-Q Compliance Server in a web browser at `http://govready-q:8000`.
 
-Next, return to a terminal on the Docker host machine and run the following command:
+Next, return to a terminal on the **Docker Host Machine** and run the following command:
 
 	docker-compose exec govready-q ./first_run.py
 
