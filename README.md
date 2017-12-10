@@ -1,12 +1,12 @@
 # Continuous ATO Kit
 
-Incorporating Compliance as Code and continous compliance within the proof-of-concept CI/CD pipeline.
+Incorporating Compliance as Code and continuous compliance within the proof-of-concept CI/CD pipeline.
 
 ![Diagram showing a build pipeline environment consisting of a Source Code Repository (GitHub) a Build Server (Jenkins), a Target Application Instance, a Security and Monitoring Server (OpenSCAP), a Compliance Server (GovReady-Q), a DevSecOps Workstation, and Production Environment.](docs/c-a-k-system-diagram-p1.png)
 
 1. [Step 1 - Install Docker](#docker)
 1. [Step 2 - Get the Kit](#getkit)
-1. [Step 3 - Set Up the Pipeline Environemnt](#pipeline)
+1. [Step 3 - Set Up the Pipeline Environment](#pipeline)
 	1. [Step 3(a) - Start the Servers and Network](#network)
 	1. [Step 3(b) - Set up Build Server](#build_server)
 	1. [Step 3(c) - Set up Security and Monitoring Server](#security_server)
@@ -78,7 +78,7 @@ Your OpenSCAP Security and Monitoring Server is now set up. Next, we'll set up t
 
 ## <a name="compliance_server"></a> Step 3(c) -  Set up Compliance Server
 
-The Compliance Server is GovReady-Q. In this step, we will add an alias entry for GovReady-Q to our host file, create an adminstration account, install the correct compliance app to display the compliance of our target app, and share credentials with Jenkins.
+The Compliance Server is GovReady-Q. In this step, we will add an alias entry for GovReady-Q to our host file, create an administration account, install the correct compliance app to display the compliance of our target app, and share credentials with Jenkins.
 
 Add an alias entry for GovReady-Q to the `/etc/hosts` file on the workstation from which you will view GovReady-Q web pages.
 
