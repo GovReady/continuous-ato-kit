@@ -24,8 +24,7 @@ First [install Docker](https://docs.docker.com/engine/installation/) and Docker 
 
 * On Mac and Windows, Docker Compose is included as part of the Docker install.
 
-* On Linux, install Docker and [install Docker Compose](https://docs.docker.com/compose/install/#install-compose). On Linux you may want to [grant non-root users access to run Docker containers](https://docs.docker.com/engine/installation/linux/linux-postinstall/#manage-docker-as-a-non-root-user).
-
+* On Linux, after installing Docker, [install Docker Compose](https://docs.docker.com/compose/install/#install-compose). Also, you may want to [grant non-root users access to run Docker containers](https://docs.docker.com/engine/installation/linux/linux-postinstall/#manage-docker-as-a-non-root-user).
 
 # <a name="getkit"></a> Step 2 - Get the Kit
 
