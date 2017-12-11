@@ -53,6 +53,8 @@ Start the Build Server, the Security and Monitoring Server, and the Compliance S
 
 This script uses Docker Compose to start the servers.  You will see the Docker build steps, and then the output will pause while the applications start up.
 
+![servers up in Terminal](docs/servers-up.png)
+
 * When the **Build Server** is up, you will see the message *"INFO: Jenkins is fully up and running"*.
 * When the **Security and Monitoring Server** is up, you will see the message *"INFO: Security and Monitoring Server is fully up and running."*
 * When the **Compliance Server** is up, you will see the message *"GovReady-Q is fully up and running."*
