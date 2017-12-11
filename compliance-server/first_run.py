@@ -33,7 +33,7 @@ print("API Key:", user.get_api_keys()['rw'])
 print("Creating default organization...")
 org = Organization.objects.filter(subdomain="main").first()
 if not org:
-  org = Organization.create(name='Department of Demonstrations', subdomain="main", admin_user=user)
+  org = Organization.create(name='Dept of Sobriety', subdomain="main", admin_user=user)
 
 # Add an AppSource that holds the demonstration compliance apps.
 ################################################################
@@ -45,7 +45,7 @@ appsrc.save()
 # Start the top-level app.
 ##########################
 print("Starting compliance app...")
-folder = Folder.objects.create(organization=org, title="App Folder")
+folder = Folder.objects.create(organization=org, title="Target App")
 top_project = start_app(appsrc.namespace + "/tacr_main_app", org, user, folder, None, None)
 
 # Start the inner app.
