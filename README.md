@@ -24,7 +24,7 @@ This proof-of-concept demonstrates how security checks, compliance testing, and 
 
 Once set up, the pipeline's Build Server (Jenkins) will assemble a Target App, tell a Security Server (OpenSCAP) to scan the Target App and its OS, then tell a Compliance Server (GovReady) to check compliance and update a System Security Plan.
 
-![sequence](docs/cak-sequence-20171206-001.png)
+![sequence](docs/awesome-ato-sequence.png)
 
 The pipeline is simplifed to run on a single workstation playing the role of both Pipeline Environment (Docker Host) and DevSecOps Workstations. Instructions refer to the Pipeline Environment and DevSecOps Workstation separately in order to communicate what is happening functionally, even though they are implemented by the same workstation in this demonstration.
 
