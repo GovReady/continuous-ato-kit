@@ -1,0 +1,3 @@
+Host build.example.net
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
