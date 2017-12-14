@@ -1,4 +1,4 @@
-# Running This Demo on Standalone Machines
+# Running This Kit On Separated Machines
 
 You can set this demo up on standalone machines (VMs at a hosting provider, physical servers, etc.) instead of Docker containers.
 
