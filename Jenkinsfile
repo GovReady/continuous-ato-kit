@@ -48,6 +48,7 @@ pipeline {
         // with "'"'s \'s escaped
         writeFile file:"ascii.txt", text:'. ____        _ _     _    ___  _  __\n | __ ) _   _(_| | __| |  / _ \\| |/ /\n |  _ \\| | | | | |/ _` | | | | | \' / \n | |_) | |_| | | | (_| | | |_| | . \\ \n |____/ \\__,_|_|_|\\__,_|  \\___/|_|\\_\\\n'
         sh 'cat ascii.txt && sleep 4'
+        input 'Ready to Test?'
       }
     }
     stage('Test') {
@@ -79,8 +80,12 @@ pipeline {
               -F "project.file_server.login_message=</tmp/pytestresults.txt" \
               -F "project.file_server.scap_scan_report=@/tmp/scan-report.html" \
               -F "project.file_server.port_scan_output=</tmp/port-scan-output.txt" \
+              -F "project.file_server.port_scan_ok=`if grep -q ^21/tcp /tmp/port-scan-output.txt; then echo no; else echo yes ; fi`" \
               --header "Authorization:$Q_API_KEY" $Q_API_URL'
         }
+
+        // Break build if port scan was not compliant
+        sh 'if grep -q ^21/tcp /tmp/port-scan-output.txt; then exit 1; fi'
 
         echo 'System is compliant.'
 
