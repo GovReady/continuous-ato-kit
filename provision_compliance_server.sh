@@ -94,11 +94,11 @@ import django; django.setup()
 import json
 
 from siteapp.models import User, Organization, Folder
-from guidedmodules.models import AppSource
+from guidedmodules.models import AppSource, TaskAnswer
 from siteapp.views import start_app
 
-# Set up a User named "demo" and print its API key.
-###################################################
+# Set up a User named "demo".
+#############################
 user, is_new = User.objects.get_or_create(username='demo')
 password = "1234"
 user.set_password(password)
@@ -108,6 +108,12 @@ user.set_password(password)
 org = Organization.objects.filter(subdomain="main").first()
 if not org:
   org = Organization.create(name='Department of Demonstrations', subdomain="main", admin_user=user)
+
+# Fill in this user's account profile in this organization.
+###########################################################
+user_profile = user.get_settings_task(org)
+user_profile_name, _ = TaskAnswer.objects.get_or_create(task=user_profile, question=user_profile.module.questions.get(key="name"))
+user_profile_name.save_answer("Security Engineer", [], None, user, "web")
 
 # Add an AppSource called "samples".
 ####################################
