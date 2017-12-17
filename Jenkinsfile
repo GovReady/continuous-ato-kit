@@ -48,7 +48,7 @@ pipeline {
         // with "'"'s \'s escaped
         writeFile file:"ascii.txt", text:'. ____        _ _     _    ___  _  __\n | __ ) _   _(_| | __| |  / _ \\| |/ /\n |  _ \\| | | | | |/ _` | | | | | \' / \n | |_) | |_| | | | (_| | | |_| | . \\ \n |____/ \\__,_|_|_|\\__,_|  \\___/|_|\\_\\\n'
         sh 'cat ascii.txt && sleep 4'
-        input 'Ready to Test?'
+        //input 'Ready to Test?'
       }
     }
     stage('Test') {
