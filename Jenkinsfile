@@ -8,6 +8,14 @@ pipeline {
   stages {
     stage('OS Setup') {
       steps {
+        // Move the yum cache to the workspace directly because it's persisted
+        // by Jenkins and makes builds (after the first build) faster.
+        sh 'mkdir -p .yum'
+        sh 'if [ ! -L /var/cache/yum ]; then \
+          rm -rf /var/cache/yum; \
+          ln -s "`pwd`/.yum" /var/cache/yum; \
+          fi'
+
         // Install packages required to build the application.
         sh 'yum -y install https://centos7.iuscommunity.org/ius-release.rpm'
         sh 'yum -y install python36u python36u-devel.x86_64 python36u-pip'
