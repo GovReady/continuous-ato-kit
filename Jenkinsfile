@@ -26,7 +26,7 @@ pipeline {
         // with "'"'s \'s escaped
         writeFile file:"ascii.txt", text:'. ____        _ _     _    ___  _  __\n | __ ) _   _(_| | __| |  / _ \\| |/ /\n |  _ \\| | | | | |/ _` | | | | | \' / \n | |_) | |_| | | | (_| | | |_| | . \\ \n |____/ \\__,_|_|_|\\__,_|  \\___/|_|\\_\\\n'
         sh 'cat ascii.txt && sleep 4'
-        input 'Ready to Test?'
+        //input 'Ready to Test?'
       }
     }
     stage('Test') {
@@ -63,7 +63,14 @@ pipeline {
         }
 
         // Break build if port scan was not compliant
-        sh 'if grep -q ^21/tcp /tmp/port-scan-output.txt; then exit 1; fi'
+        // http://www.patorjk.com/software/taag/#p=display&h=3&v=2&f=Standard&t=Out%20Of%20Compliance
+        // (', \, and newlines escaped)
+        writeFile file:"ascii.txt", text:'   ___        _      ___   __    ____                      _ _                      \n  / _ \\ _   _| |_   / _ \\ / _|  / ___|___  _ __ ___  _ __ | (_) __ _ _ __   ___ ___ \n | | | | | | | __| | | | | |_  | |   / _ \\| \'_ ` _ \\| \'_ \\| | |/ _` | \'_ \\ / __/ _ \\\n | |_| | |_| | |_  | |_| |  _| | |__| (_) | | | | | | |_) | | | (_| | | | | (_|  __/\n  \\___/ \\__,_|\\__|  \\___/|_|    \\____\\___/|_| |_| |_| .__/|_|_|\\__,_|_| |_|\\___\\___|\n                                                    |_|                             '
+        sh 'if grep -q ^21/tcp /tmp/port-scan-output.txt; then \
+          cat ascii.txt && sleep 4; \
+          exit 1; \
+        fi'
+
 
         echo 'System is compliant.'
 
