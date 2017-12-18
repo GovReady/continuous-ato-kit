@@ -1,6 +1,8 @@
 # Continuous ATO Kit
 
-This proof-of-concept demonstrates how security checks, compliance testing, and compliance artifact maintenance can be an automated part of the Continuous Integration/Continuous Deployment (CI/CD) pipeline.
+The Continuous ATO Kit is a reference implementation of continuous compliance automation--security checking, compliance testing, and compliance artifact maintenance--in the Continuous Integration/Continuous Deployment (CI/CD) pipeline.
+
+The example scenerio is getting and continuously monitoring an ATO (Authority To Operate) for an IT system at an agency in the federal government under the NIST RMF (Risk Management Framework).
 
 Documentation for this project can be found in the following documents:
 
