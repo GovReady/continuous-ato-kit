@@ -27,5 +27,9 @@ RUN sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/ssh
 # Create a user for the other server to log in as.
 RUN useradd target && mkdir /home/target/.ssh && chmod 700 /home/target/.ssh
 
+# Run `fix.sh`
+COPY fix.sh ./
+RUN bash -x ./fix.sh >fix-logs.txt
+
 # start a null process
 CMD ["/usr/sbin/init"]
