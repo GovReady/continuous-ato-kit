@@ -11,7 +11,8 @@
 1. [Step 4 - Set Up Build Task](#buildtask)
 1. [Step 5 - Build Target App](#build)
 1. [Step 6 - View Compliance Artifacts](#view)
-1. [Step 7 - Tear-down](#teardown)
+1. [Step 7 - Try a Build that Isn't Compliant](#noncompliant)
+1. [Step 8 - Tear-down](#teardown)
 
 # <a name="overview"></a> Overview
 
@@ -260,8 +261,11 @@ Go back, then click “SSP Preview” at the bottom of the page. Scroll down to 
 
 ![GovReady-Q SSP](docs/govready-q-ssp.png)
 
+# <a name="noncompliant"></a> Step 7 - Try a Build that Isn't Compliant
 
-# <a name="teardown"></a> Tear-down
+TODO
+
+# <a name="teardown"></a> Step 8 - Tear-down
 
 Kill the atokit-up script running in the first terminal by pressing CTRL+C on the keyboard.
 

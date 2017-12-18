@@ -42,3 +42,21 @@ The `nmap` port scan in the separated version removes the `-p-` and `-sT` flags;
 * Copy and paste the content of `Jenkinsfile.separated` into the text box.
 * Replace the two instances of `security.example.net`with the hostname of your **Security and Monitoring Server**.
 * When setting up the credentials, use the `target_ecdsa.pub` file you created above, instead of the file included in the repo.
+
+### Breaking the Build
+
+To demonstrate a compliance failure, log into the Jenkins server and run:
+
+	firewall-cmd --zone=public --add-port=21/tcp --permanent
+	firewall-cmd --reload
+
+to open port 21 in the software firewall. The open port will fail a business logic rule in the compliance stage of the Jenkinsfile.
+
+To have the build succeed again, close the port:
+
+	firewall-cmd --zone=public --remove-port=21/tcp --permanent
+	firewall-cmd --reload
+
+To check whether the port is open:
+
+	firewall-cmd --list-all
