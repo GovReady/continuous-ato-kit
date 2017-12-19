@@ -6,7 +6,7 @@ EXPOSE 22
 
 # Install packages required to build the application.
 RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
-RUN yum -y install python36u python36u-devel.x86_64 python36u-pip
+RUN yum -y install git python36u python36u-devel.x86_64 python36u-pip
 
 # Install packages required to allow the Security and Monitoring Server
 # to log into this container and run OpenSCAP.
