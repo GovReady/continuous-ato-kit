@@ -92,7 +92,6 @@ pipeline {
           exit 1; \
         fi'
 
-
         echo 'System is compliant.'
 
         echo 'Notifications sent to information system security officer.'
