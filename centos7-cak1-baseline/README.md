@@ -23,10 +23,12 @@ oscap xccdf eval --profile nist-800-171-cui  --fetch-remote-resources --results 
 oscap xccdf generate fix --fetch-remote-resources --result-id xccdf_org.open-scap_testresult_nist-800-171-cui scan-results.xml > fix.sh
 ```
 
-After it's generated, copy it out of the container and into your copy of the repo directory (customize this command with the name of your container, and the directory within the container where you generated the `fix.sh` file):
+After it's generated, copy it out of the container and into your copy of the repo directory (customize the `docker exec` command with the name of your container, and the directory within the container where you generated the `fix.sh` file):
 
 ```
 cp fix-sh-preamble.txt fix.sh
 docker exec -it tmp-cak1-baseline cat /fix.sh >>fix.sh
 chmod +x fix.sh
 ```
+
+If you are on a Unix-based system, you may need to remove carriage return characters from `fix.sh` with something like `tr -d '\r'` or `sed 's/\r//'`.
