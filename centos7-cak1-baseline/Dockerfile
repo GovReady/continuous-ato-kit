@@ -29,7 +29,7 @@ RUN useradd target && mkdir /home/target/.ssh && chmod 700 /home/target/.ssh
 
 # Run `fix.sh`
 COPY fix.sh ./
-RUN bash -x ./fix.sh 1>fix-logs.txt 2>fix-errors.txt
+RUN bash -x ./fix.sh 1>fix-stdout.txt 2>fix-stderr.txt
 
 # start a null process
 CMD ["/usr/sbin/init"]
