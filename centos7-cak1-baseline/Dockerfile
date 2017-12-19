@@ -31,7 +31,7 @@ RUN useradd target && mkdir /home/target/.ssh && chmod 700 /home/target/.ssh
 COPY fix.sh ./
 RUN bash -x ./fix.sh 1>fix-stdout.txt 2>fix-stderr.txt
 
-# Other remediations
+# Additional Remediations
 # rpm_verify_permissions
 RUN chmod 666 /
 # sshd_allow_only_protocol2
