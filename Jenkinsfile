@@ -1,43 +1,28 @@
 pipeline {
   agent {
     docker {
-      image 'centos:7'
+      image 'govready/centos7-cak1-baseline'
       args '--network continuousatokit_ato_network --name target-app-server'
     }
   }
   stages {
     stage('OS Setup') {
       steps {
-        // Move the yum cache to the workspace directly because it's persisted
-        // by Jenkins and makes builds (after the first build) faster.
-        sh 'mkdir -p .yum'
-        sh 'if [ ! -L /var/cache/yum ]; then \
-          rm -rf /var/cache/yum; \
-          ln -s "`pwd`/.yum" /var/cache/yum; \
-          fi'
+        // Uncomment this section if you need to install any packages for the target
+        // application that aren't alredy installed in the base image
+        //
+        // // Move the yum cache to the workspace directly because it's persisted
+        // // by Jenkins and makes builds (after the first build) faster.
+        // sh 'mkdir -p .yum'
+        // sh 'if [ ! -L /var/cache/yum ]; then \
+        //   rm -rf /var/cache/yum; \
+        //   ln -s "`pwd`/.yum" /var/cache/yum; \
+        //   fi'
+        //
+        // // Install packages required to build the application.
+        // sh 'yum -y install https://centos7.iuscommunity.org/ius-release.rpm'
+        // sh 'yum -y install git python36u python36u-devel.x86_64 python36u-pip'
 
-        // Install packages required to build the application.
-        sh 'yum -y install https://centos7.iuscommunity.org/ius-release.rpm'
-        sh 'yum -y install git python36u python36u-devel.x86_64 python36u-pip'
-
-        // Install packages required to allow the Security and Monitoring Server
-        // to log into this container and run OpenSCAP.
-        //
-        // Install OpenSCAP.
-        sh 'yum install -y openscap-scanner scap-security-guide'
-        //
-        // Install sshd, generate the server SSH keys, and configure sshd to
-        // allow login via a public key:
-        sh 'yum install -y openssh-server openssh-clients'
-        sh 'mkdir /var/run/sshd'
-        sh "ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''"
-        sh "ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N ''"
-        sh "ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''"
-        sh "sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config"
-        //
-        // Create a user for the other server to log in as.
-        sh 'useradd target && mkdir /home/target/.ssh && chmod 700 /home/target/.ssh'
-        //
         // Install target app server public key.
         withCredentials([file(credentialsId: 'target_ecdsa.pub', variable: 'TARGET_ECDSA_PUB')]) {
             sh 'mv "$TARGET_ECDSA_PUB" /home/target/.ssh/authorized_keys'
@@ -106,7 +91,6 @@ pipeline {
           cat ascii.txt && sleep 4; \
           exit 1; \
         fi'
-
 
         echo 'System is compliant.'
 
