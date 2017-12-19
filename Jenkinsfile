@@ -8,6 +8,21 @@ pipeline {
   stages {
     stage('OS Setup') {
       steps {
+        // Uncomment this section if you need to install any packages for the target
+        // application that aren't alredy installed in the base image
+        //
+        // // Move the yum cache to the workspace directly because it's persisted
+        // // by Jenkins and makes builds (after the first build) faster.
+        // sh 'mkdir -p .yum'
+        // sh 'if [ ! -L /var/cache/yum ]; then \
+        //   rm -rf /var/cache/yum; \
+        //   ln -s "`pwd`/.yum" /var/cache/yum; \
+        //   fi'
+        //
+        // // Install packages required to build the application.
+        // sh 'yum -y install https://centos7.iuscommunity.org/ius-release.rpm'
+        // sh 'yum -y install git python36u python36u-devel.x86_64 python36u-pip'
+
         // Install target app server public key.
         withCredentials([file(credentialsId: 'target_ecdsa.pub', variable: 'TARGET_ECDSA_PUB')]) {
             sh 'mv "$TARGET_ECDSA_PUB" /home/target/.ssh/authorized_keys'
@@ -20,7 +35,13 @@ pipeline {
     }
     stage('Build') {
       steps {
-        sh 'pip3.6 install mondrianish'
+        // Get application source code.
+        sh 'rm -rf mondrianish'
+        sh 'git clone https://github.com/GovReady/mondrianish'
+
+        // Build the library.
+        sh 'cd mondrianish && pip3.6 install -r requirements.txt'
+        sh 'cd mondrianish && python3.6 setup.py build'
 
         // http://www.patorjk.com/software/taag/#p=display&h=3&v=2&f=Standard&t=Build%20OK
         // with "'"'s \'s escaped
@@ -32,10 +53,10 @@ pipeline {
     stage('Test') {
       steps {
         // Run the application.
-        sh 'LANG=en_US.UTF-8 mondrianish --size 20x10 text'
+        sh 'cd mondrianish && LANG=en_US.UTF-8 python3.6 mondrianish/__init__.py --size 40x12 text'
 
         // Run python unit tests.
-        sh 'python tests.py 2>&1 | tee /tmp/pytestresults.txt'
+        sh 'cd mondrianish && python3.6 test.py 2>&1 | tee /tmp/pytestresults.txt'
         sh 'sed -i s/$/\\\\\\\\/ /tmp/pytestresults.txt'
         sh 'echo >> /tmp/pytestresults.txt' // add blank line because trailing \ is not valid as a hard break
         sh 'echo >> /tmp/pytestresults.txt' // add blank line because trailing \ is not valid as a hard break
