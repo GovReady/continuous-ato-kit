@@ -1,0 +1,5 @@
+install_antivirus
+install_hids
+installed_OS_is_certified
+rpm_verify_hashes
+rpm_verify_permissions

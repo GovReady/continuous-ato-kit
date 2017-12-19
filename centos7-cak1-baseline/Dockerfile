@@ -31,5 +31,17 @@ RUN useradd target && mkdir /home/target/.ssh && chmod 700 /home/target/.ssh
 COPY fix.sh ./
 RUN bash -x ./fix.sh 1>fix-stdout.txt 2>fix-stderr.txt
 
+# Other remediations
+# rpm_verify_permissions
+RUN chmod 666 /
+# sshd_allow_only_protocol2
+RUN echo 'Protocol 2' >> /etc/ssh/sshd_config
+# sshd_disable_empty_passwords
+RUN echo 'PermitEmptyPasswords no' >> /etc/ssh/sshd_config
+
+# Disable broken or not applicable rules
+COPY disable-*.txt ./
+RUN for j in /usr/share/xml/scap/ssg/content/ssg-centos7-*.xml; do for i in `cat disable-*.txt` ; do awk '/'[[:punct:][:space:]]$i'"/{sub(/selected="true"/, "selected=\"false\"")}; 1' $j > $j-new ; mv -f $j-new $j ; done ; done
+
 # start a null process
 CMD ["/usr/sbin/init"]
