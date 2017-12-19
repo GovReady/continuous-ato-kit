@@ -73,7 +73,7 @@ docker exec -it dev003 bash
 # make changes, the start again at the top
 
 # when done, build the release and push
-docker build --tag govready/centos7-cak1-baseline:dev003 .
+docker build --tag govready/centos7-cak1-baseline:latest .
 docker push govready/centos7-cak1-baseline:latest
 ```
 
