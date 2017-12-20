@@ -8,11 +8,11 @@ We've included this directory so you can see how the base image used in the demo
 
 The general topic of resolving OpenSCAP issues in any environment, and particularly production, is complex, and should be done in collaboration with your Information System Security Officer (ISSO).  A deep dive into the topic is out of scope for this demo kit.
 
-We had these goals:
+We had these goals and motivations:
 
 * Favor demo-ability over actual hardening -- after all this is a demo, not a production deployment.
 * Have an executive demo that flows quickly and smoothly and simulates a 100% green scan result.
-* Fixing all scan configuration issues due running within a Docker Community Edition container is out of scope.
+* Fixing all scan configuration issues due to running within a Docker Community Edition container is out of scope.
 
 We took two approaches:
 
