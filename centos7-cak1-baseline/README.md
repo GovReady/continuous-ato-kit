@@ -10,9 +10,9 @@ The general topic of resolving OpenSCAP issues in any environment, and particula
 
 We had these goals:
 
-* Favor demo-ability over actual hardening of the **Target Application Server** -- after all this is a demo, not a production deployment.
-* Have the demo flow quickly and smoothly -- ideally, with a 100% green scan result.
-* Fixing issues due to the scan running within a Docker container may be out of scope.
+* Favor demo-ability over actual hardening -- after all this is a demo, not a production deployment.
+* Have an executive demo that flows quickly and smoothly and simulates a 100% green scan result.
+* Fixing all scan configuration issues due running within a Docker Community Edition container is out of scope.
 
 We took two approaches:
 
