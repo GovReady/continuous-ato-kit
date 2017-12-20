@@ -263,7 +263,21 @@ Go back, then click “SSP Preview” at the bottom of the page. Scroll down to 
 
 # <a name="noncompliant"></a> Step 7 - Try a Build that Isn't Compliant
 
-TODO
+You will go back to [Step 5 - Build Target App](#build), but first, queue up this command in a new terminal.  Do not press ENTER yet, though.
+
+```
+docker exec -it target-app-server python -m SimpleHTTPServer 21 >/dev/null
+```
+
+This command will simulate an open FTP port, which represents a security risk that will be caught during the port scan.  When the command is ready to go, proceed again with [Step 5](#build).
+
+A few seconds after the build has started, press ENTER in the terminal to start the simulated FTP server.  If you get an error, "Error: No such container: target-app-server", it means the build hasn't quite started -- just try the command again.
+
+During the Test stage, the port scan will detect the open port, and stop the build with the message "Out Of Compliance".  If you have the GovReady-Q SSP page up in your web browser, you will see an out-of-compliance alert there, too.
+
+When the build ends, the simulated FTP server command will automatically exit.  If you want to kill the FTP server at any other time, you can press CTRL+C on the keyboard, and you'll get your command prompt back.
+
+You can re-run the Jenkins build as many times as you like.  If the simulated FTP server is running, the build will fail with "Out Of Compliance".  If it is not running, it will complete successfully with the "Compliant" message.
 
 # <a name="teardown"></a> Step 8 - Tear-down
 
