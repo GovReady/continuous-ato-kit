@@ -249,7 +249,7 @@ Click “Review” to inspect the information uploaded to the compliance server 
 
 ![GovReady-Q Review Page](docs/govready-q-review.png)
 
-Go back, then click “SSP Preview” at the bottom of the page. Scroll down to `CM-6: Configuration Settings`. You will see that:
+Go back, then click “SSP Preview” at the bottom of the page. Scroll down to `RA-5: Vulnerability Scanning`. You will see that:
 
 * The hostname of the build container was collected during the build and appears in the System Security Plan.
 
