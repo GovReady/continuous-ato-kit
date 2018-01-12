@@ -1,8 +1,33 @@
-# Running This Kit On Separated Machines
+# Enterprise Deployment Guide
 
-You can set this demo up on separated machines (VMs at a hosting provider, physical servers, etc.) instead of Docker containers.
+In an enterprise environment, physical servers or long-lasting virtual machines are more likely to be used for a build pipeline (than Docker containers, which we used in our [main deployment example](TryIt.md)). This demo can be set up on separated machines as well, instead of Docker containers, to model an enterprise deployment pipeline.
 
-Follow the general server setup specified in `docker-compose.yml` to set up your machines.
+## The Servers
+
+As in our [Docker container configuration](TryIt.md), the enterprise pipeline environment consists of:
+
+* A **Build Server** running Jenkins
+* A **Security Server** running OpenSCAP and nmap
+* A **Compliance Server** running [GovReady-Q](https://github.com/GovReady/govready-q)
+
+### The Build Server
+
+We leave it to you to install Jenkins on the **Build Server**. We have found it convenient to start Jenkins using Docker, e.g. with the following command:
+
+	docker run --name jenkins --rm -u root \
+	  -v jenkins-data:/var/jenkins_home \
+	  -v /var/run/docker.sock:/var/run/docker.sock \
+	  jenkinsci/blueocean
+
+However, you can install Jenkins in the manner most familiar to you.
+
+### The Security Server
+
+In our demonstration, the Security Server is a CentOS 7 machine running a small daemon that performs security scans on other machines at the request of other machines.
+
+On your security server, install Python and nmap, and place [security-server/scan-http-daemon.py](security-server/scan-http-daemon.py) onto the server. Edit the script to modify the `ssh` and `nmap` commands as appropriate to scan the target application running on the **Build Server**.
+
+---
 
 The following pre-modified files should also help you get started.  They remove some of the configuration we used specifically for the Docker container constellation the demo creates.
 
