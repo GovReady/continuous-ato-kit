@@ -5,10 +5,14 @@
 1. [Step 2 - Get This Kit](#getkit)
 1. [Step 3 - Set Up the Pipeline Environment](#pipeline)
 	1. [Step 3(a) - Start the Servers and Network](#network)
-	1. [Step 3(b) - Set Up Build Server](#build_server)
-	1. [Step 3(c) - Set Up Security Server](#security_server)
-	1. [Step 3(d) - Set Up Compliance Server](#compliance_server)
+	1. [Step 3(b) - Set Up Build Server](#buildserver)
+	1. [Step 3(c) - Set Up Security Server](#securityserver)
+	1. [Step 3(d) - Set Up Compliance Server](#complianceserver)
 1. [Step 4 - Set Up Build Task](#buildtask)
+	1. [Step 4(a) Add Compliance Server credentials](#credentialscompliance)
+	1. [Step 4(b) Add Security Server credentials](#credentialssecurity)
+	1. [Step 4(c) Create the Jenkins Pipeline](#buildpipeline)
+
 1. [Step 5 - Build Target App](#build)
 1. [Step 6 - View Compliance Artifacts](#view)
 1. [Step 7 - Try a Build that Isn't Compliant](#noncompliant)
@@ -85,7 +89,7 @@ Wait for the three servers to say they are each ready:
 The pipeline environment now exists. In the next step, we'll set up and configure the software in the pipeline.
 
 
-## <a name="build_server"></a> Step 3(b) - Set Up Build Server
+## <a name="buildserver"></a> Step 3(b) - Set Up Build Server
 
 The **Build Server** is running Jenkins based on the official `jenkinsci/blueocean` image on Docker Hub. It will store persistent data in a Docker volume named `jenkins-data`. It will run on port 8080.
 
@@ -110,14 +114,14 @@ Choose “Install Suggested Packages”, then “Continue as admin”, then “S
 Your Jenkins Build Server is now set up. Next, we'll set up the Security and Monitoring Server.
 
 
-## <a name="security_server"></a> Step 3(b) - Set Up Security Server
+## <a name="securityserver"></a> Step 3(b) - Set Up Security Server
 
 The **Security Server** has been built by Docker Compose using our [security-server Dockerfile](security-server/Dockerfile). It is based on the official CentOS 7 image from Docker Hub and is automatically set up with OpenSCAP and nmap and is ready to run during the build process. There is nothing further than needs to be done to set up the Security Server.
 
 Next, we'll set up the Compliance Server.
 
 
-## <a name="compliance_server"></a> Step 3(c) -  Set Up Compliance Server
+## <a name="complianceserver"></a> Step 3(c) -  Set Up Compliance Server
 
 The **Compliance Server** is running GovReady-Q based on GovReady's official nightly image on the Docker Hub. It is now running on port 8000.
 
@@ -166,12 +170,9 @@ View the Compliance App by clicking “Target App” and then “TACR SSP All”
 
 # <a name="buildtask"></a> Step 4 - Set up Build Task
 
+## <a name="credentialscompliance"></a> Step 4(a) -  Add Compliance Server credentials
 
-## Provide Security and Compliance Server Credentials to Jenkins
-
-The Jenkins build will collect and generate compliance evidence that will be stored on the **Compliance Server**. Additionally, the **Security Server** will scan the target application by running OpenSCAP on the **Target App Container** over SSH. Jenkins will therefore need write-access credentials to the Compliance App on GovReady-Q that will hold the evidence collected and generated during builds, and the **Security Server** will need login access to the **Target App Container**. These credentials will be managed by the Jenkins Credentials plugin.
-
-### Add Compliance Server credentials
+The Jenkins build will collect and generate compliance evidence that will be stored on the **Compliance Server** and will need write-access credentials to the Compliance App on GovReady-Q that will hold the evidence collected and generated during builds.
 
 In Jenkins, go to the top level of Jenkins, and then to the Credentials page.
 
@@ -187,14 +188,16 @@ Once the credentials have been set, they will look like this:
 
 ![](docs/jenkins-credentials-1.png)
 
-### Add Security Server credentials
+## <a name="credentialssecurity"></a> Step 4(b) Add Security Server credentials
+
+The **Security Server** will need login access to the **Target App Container** and we need to tell Jenkins these credentials, too.
 
 Add a third credential whose kind is “Secret file”. Browse to [security-server/keys/id_ecdsa.pub](security-server/keys/id_ecdsa.pub) in this repository to select it. Set the credential ID to `target_ecdsa.pub`. This file is part of a pre-generated, unsafe public-private keypair that should only be used in a throw-away environment like this one.
 
 In the next step, we will set up the build task in Jenkins. Then we will be ready to run our build and watch our Security Server scan our target app and update compliance artifacts in our GovReady-Q Compliance Server.
 
 
-## Create the Jenkins Pipeline
+## <a name="buildpipeline"></a> Step 4(c) - Create the Jenkins Pipeline
 
 This tutorial will build [the Jenkinsfile in this repository](Jenkinsfile), as if it were the target application's Jenkinsfile. We will have Jenkins pull the code in this repository directly from GitHub. (You can certainly also build from a local repository, but because Jenkins is running in a virtualized container access to the host machine's filesystem is limited in this setup.)
 
