@@ -69,12 +69,14 @@ pipeline {
     stage('Compliance') {
       steps {
         // Ask the Security Monitoring Server to scan this system.
-        sh 'curl -s http://security-server:8045/oscap'
-        sh 'curl -s http://security-server:8045/port-scan > /tmp/port-scan-output.txt'
+        sh 'curl http://security-server:8045/oscap'
+        sh 'head /tmp/scan-report.html'
+
+        sh 'curl -Ss http://security-server:8045/port-scan > /tmp/port-scan-output.txt'
 
         // Send hostname, test results, and scan results to Q.
         withCredentials([string(credentialsId: 'govready_q_api_url', variable: 'Q_API_URL'), string(credentialsId: 'govready_q_api_key', variable: 'Q_API_KEY')]) {
-            sh 'curl -s \
+            sh 'curl --progress-bar \
               -F "project.file_server.hostname=$(hostname)" \
               -F "project.file_server.login_message=</tmp/pytestresults.txt" \
               -F "project.file_server.scap_scan_report=@/tmp/scan-report.html" \
