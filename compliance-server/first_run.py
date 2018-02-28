@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.6
 
 import os.path
 import time
@@ -44,7 +44,7 @@ user_profile_name.save_answer("Security Engineer", [], None, user, "web")
 # Add an AppSource that holds the demonstration compliance apps.
 ################################################################
 print("Adding TACR Demo Apps...")
-appsrc, is_new = AppSource.objects.get_or_create(namespace="demo")
+appsrc, is_new = AppSource.objects.get_or_create(slug="demo")
 appsrc.spec = { 'type': "git", "url": "https://github.com/GovReady/tacr-demo-apps" }
 appsrc.save()
 
@@ -52,11 +52,11 @@ appsrc.save()
 ##########################
 print("Starting compliance app...")
 folder = Folder.objects.create(organization=org, title="Target App")
-top_project = start_app(appsrc.namespace + "/tacr_main_app", org, user, folder, None, None)
+top_project = start_app(appsrc.slug + "/tacr_main_app", org, user, folder, None, None)
 
 # Start the inner app.
 ######################
 task = top_project.root_task
 q = task.module.questions.get(key="file_server")
-inner_project = start_app(appsrc.namespace + "/unix_file_server", org, user, None, task, q)
+inner_project = start_app(appsrc.slug + "/unix_file_server", org, user, None, task, q)
 print("API URL:", inner_project.get_api_url())
