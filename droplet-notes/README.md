@@ -16,7 +16,7 @@ Change GovReady-Q's hostname from the unqualified default "govready-q" to the fu
 
 Start the homepage server that also can start/stop the fake FTP process that opens a port on the target application server:
 
-    (cd droplet-notes/; python3 daemon.py;) &
+    (cd droplet-notes/; nohup python3 daemon.py;) &
 
 Start the kit:
 

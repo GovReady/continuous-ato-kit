@@ -14,7 +14,7 @@ def start_ftp_server(resp):
     if ftp_server_proc is not None:
         stop_ftp_server(resp)
     resp.write(b'Opening port 21 on the target application server...\n\n')
-    ftp_server_proc = subprocess.Popen("docker exec -it target-app-server python -m SimpleHTTPServer 21 >/dev/null", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ftp_server_proc = subprocess.Popen("docker exec target-app-server python -m SimpleHTTPServer 21", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     resp.write(b'FTP server started...\n\n')
     try:
         ftp_server_proc.wait(2)
