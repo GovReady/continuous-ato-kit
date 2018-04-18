@@ -20,7 +20,9 @@ Start the homepage server that also can start/stop the fake FTP process that ope
 
 Start the kit:
 
-    ./atokit-up.sh
+    ./atokit-up.sh --verbose
+
+CTRL+C the process when it's ready to get back to the terminal.
 
 Get credentials:
 

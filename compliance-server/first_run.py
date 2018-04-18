@@ -5,7 +5,7 @@ import time
 import json
 
 # wait for Q to finish initializing
-while not os.path.exists("ready"):
+while not os.path.exists("/tmp/govready-q-is-ready"):
 	print("Waiting for GovReady-Q to start up...")
 	time.sleep(4)
 
